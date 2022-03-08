@@ -6,7 +6,7 @@
   <link href="https://wa0er.github.io/atom.xml" rel="self"/>
   
   <link href="https://wa0er.github.io/"/>
-  <updated>2022-03-07T13:56:47.007Z</updated>
+  <updated>2022-03-08T12:26:37.055Z</updated>
   <id>https://wa0er.github.io/</id>
   
   <author>
@@ -17,49 +17,27 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>test_my_site</title>
-    <link href="https://wa0er.github.io/posts/63153.html"/>
-    <id>https://wa0er.github.io/posts/63153.html</id>
-    <published>2022-03-04T13:53:07.000Z</published>
-    <updated>2022-03-07T13:56:47.007Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;test-title-p1&quot;&gt;&lt;a href=&quot;#test-title-p1&quot; class=&quot;headerlink&quot; title=&quot;test title p1&quot;&gt;&lt;/a&gt;test title p1&lt;/h1&gt;&lt;p&gt;test text p1&lt;/p&gt;
-&lt;h2</summary>
-        
-      
-    
-    
-    
-    <category term="test_categories" scheme="https://wa0er.github.io/categories/test-categories/"/>
-    
-    
-    <category term="test_tags" scheme="https://wa0er.github.io/tags/test-tags/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Hello World</title>
-    <link href="https://wa0er.github.io/posts/16108.html"/>
-    <id>https://wa0er.github.io/posts/16108.html</id>
-    <published>2022-03-04T13:52:02.564Z</published>
-    <updated>2022-03-06T12:29:58.740Z</updated>
+    <link href="https://wa0er.github.io/posts/4a17b156.html"/>
+    <id>https://wa0er.github.io/posts/4a17b156.html</id>
+    <published>2022-03-08T12:10:39.000Z</published>
+    <updated>2022-03-08T12:26:37.055Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
+    <summary type="html">&lt;pre class=&quot;line-numbers language-c&quot; data-language=&quot;c&quot;&gt;&lt;code class=&quot;language-c&quot;&gt;&lt;span class=&quot;token macro property&quot;&gt;&lt;span class=&quot;token</summary>
         
       
     
     
     
+    <category term="Hello World" scheme="https://wa0er.github.io/categories/Hello-World/"/>
+    
+    
+    <category term="Hello World" scheme="https://wa0er.github.io/tags/Hello-World/"/>
     
   </entry>
   
