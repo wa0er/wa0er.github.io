@@ -253,11 +253,11 @@ mark {
 }
 
 .progress-bar {
-    height: 4px;
+    height: 5px;
     position: fixed;
-    bottom: 0;
+    top: 64px;
     z-index: 300;
-    background: linear-gradient(to right, #4cbf30 0%, #0f9d58 100%);
+    background: linear-gradient(to right, #00d2ff 0%, #928DAB 100%);
     opacity: 0.8;
 }
 
