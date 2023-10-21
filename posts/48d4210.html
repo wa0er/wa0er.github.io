@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 6.0.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -495,6 +495,11 @@
         <link rel="stylesheet" href="/libs/prism/prism.css">
         
 
+        
+        <!-- 代码块折行 -->
+        <style type="text/css">
+            code[class*="language-"], pre[class*="language-"] { white-space: pre-wrap !important; }
+        </style>
         
 
         <div class="card-content article-card-content">
@@ -1100,7 +1105,7 @@ conn<span class="token punctuation">.</span>close<span class="token punctuation"
 <div id="article-share">
 
     
-    <div class="social-share" data-sites="wechat,qq,weibo,qzone,twitter,facebook,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <div class="social-share" data-sites="wechat,qq,weibo,qzone,twitter" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
     <script src="/libs/share/js/social-share.min.js"></script>
     
 
@@ -1211,7 +1216,7 @@ conn<span class="token punctuation">.</span>close<span class="token punctuation"
     <div id="rewardModal" class="modal">
         <div class="modal-content">
             <a class="close modal-close"><i class="fas fa-times"></i></a>
-            <h4 class="reward-title">您的捐赠就是对我最大的支持</h4>
+            <h4 class="reward-title">祝客官顺风顺水顺财神</h4>
             <div class="reward-content">
                 <div class="reward-tabs">
                     <ul class="tabs row">
@@ -1593,47 +1598,57 @@ conn<span class="token punctuation">.</span>close<span class="token punctuation"
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/48d4210.html">
+                <a href="/posts/1e9a0fae.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/CTF.gif" class="responsive-img" alt="蓝帽杯2021-OnePointerPHP">
+                        <img src="/medias/article_cover/Log4j2.png" class="responsive-img" alt="Log4j2（CVE-2021-44228）漏洞复现及原理思考">
                         
-                        <span class="card-title">蓝帽杯2021-OnePointerPHP</span>
+                        <span class="card-title">Log4j2（CVE-2021-44228）漏洞复现及原理思考</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            蓝帽杯2021-OnePointerPHP
+                            Log4j2的JNDI注入漏洞（CVE-2021-44228）可以称之为“核弹”级别。Log4j2作为类似jdk级别的基础类库，几乎无人幸免。
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-26
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-10-21
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/CTF/" class="post-category">
-                                    CTF
+                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="post-category">
+                                    漏洞复现
+                                </a>
+                            
+                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/" class="post-category">
+                                    细读经典
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/CTF/">
-                        <span class="chip bg-color">CTF</span>
+                    <a href="/tags/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/">
+                        <span class="chip bg-color">细读经典</span>
+                    </a>
+                    
+                    <a href="/tags/Log4j2/">
+                        <span class="chip bg-color">Log4j2</span>
+                    </a>
+                    
+                    <a href="/tags/JNDI%E6%B3%A8%E5%85%A5/">
+                        <span class="chip bg-color">JNDI注入</span>
                     </a>
                     
                 </div>
@@ -1776,7 +1791,7 @@ conn<span class="token punctuation">.</span>close<span class="token punctuation"
             tocSelector: '#toc-content',
             contentSelector: '#articleContent',
             headingsOffset: -($(window).height() * 0.4 - 45),
-            collapseDepth: Number('0'),
+            collapseDepth: Number('5'),
             headingSelector: 'h2, h3, h4'
         });
 
@@ -1869,7 +1884,7 @@ conn<span class="token punctuation">.</span>close<span class="token punctuation"
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">54.2k&nbsp;字</span>
+                        class="white-color">57.9k&nbsp;字</span>
             
             
 

