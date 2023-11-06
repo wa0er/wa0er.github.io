@@ -6,7 +6,7 @@
   <link href="https://wa0er.github.io/atom.xml" rel="self"/>
   
   <link href="https://wa0er.github.io/"/>
-  <updated>2023-10-21T06:20:58.968Z</updated>
+  <updated>2023-11-06T10:07:27.207Z</updated>
   <id>https://wa0er.github.io/</id>
   
   <author>
@@ -17,11 +17,61 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>HTB-Sandworm</title>
+    <link href="https://wa0er.github.io/posts/5f6105d4.html"/>
+    <id>https://wa0er.github.io/posts/5f6105d4.html</id>
+    <published>2023-10-28T11:00:00.000Z</published>
+    <updated>2023-11-06T10:07:27.207Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;HTB-Sandworm&quot;&gt;&lt;a href=&quot;#HTB-Sandworm&quot; class=&quot;headerlink&quot; title=&quot;HTB-Sandworm&quot;&gt;&lt;/a&gt;HTB-Sandworm&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
+    
+    
+    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTB-Jupiter</title>
+    <link href="https://wa0er.github.io/posts/d4f5920f.html"/>
+    <id>https://wa0er.github.io/posts/d4f5920f.html</id>
+    <published>2023-10-21T11:00:00.000Z</published>
+    <updated>2023-11-06T10:07:04.230Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;HTB-Jupiter&quot;&gt;&lt;a href=&quot;#HTB-Jupiter&quot; class=&quot;headerlink&quot; title=&quot;HTB-Jupiter&quot;&gt;&lt;/a&gt;HTB-Jupiter&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a href=&quot;#一、思路概要&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
+    
+    
+    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Log4j2（CVE-2021-44228）漏洞复现及原理思考</title>
     <link href="https://wa0er.github.io/posts/1e9a0fae.html"/>
     <id>https://wa0er.github.io/posts/1e9a0fae.html</id>
     <published>2023-10-21T04:00:00.000Z</published>
-    <updated>2023-10-21T06:20:58.968Z</updated>
+    <updated>2023-11-06T10:10:17.192Z</updated>
     
     
       
@@ -48,6 +98,81 @@
   </entry>
   
   <entry>
+    <title>HTB-Pilgrimage</title>
+    <link href="https://wa0er.github.io/posts/3e4c0ff8.html"/>
+    <id>https://wa0er.github.io/posts/3e4c0ff8.html</id>
+    <published>2023-10-14T11:00:00.000Z</published>
+    <updated>2023-11-06T10:05:49.379Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;HTB-Pilgrimage&quot;&gt;&lt;a href=&quot;#HTB-Pilgrimage&quot; class=&quot;headerlink&quot; title=&quot;HTB-Pilgrimage&quot;&gt;&lt;/a&gt;HTB-Pilgrimage&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
+    
+    
+    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTB-Format</title>
+    <link href="https://wa0er.github.io/posts/ec5f74de.html"/>
+    <id>https://wa0er.github.io/posts/ec5f74de.html</id>
+    <published>2023-10-06T11:00:00.000Z</published>
+    <updated>2023-11-06T10:05:13.765Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;HTB-Format&quot;&gt;&lt;a href=&quot;#HTB-Format&quot; class=&quot;headerlink&quot; title=&quot;HTB-Format&quot;&gt;&lt;/a&gt;HTB-Format&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a href=&quot;#一、思路概要&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
+    
+    
+    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTB-Wifinetic</title>
+    <link href="https://wa0er.github.io/posts/e48c1386.html"/>
+    <id>https://wa0er.github.io/posts/e48c1386.html</id>
+    <published>2023-09-30T11:00:00.000Z</published>
+    <updated>2023-11-06T10:03:36.431Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;HTB-Wifinetic&quot;&gt;&lt;a href=&quot;#HTB-Wifinetic&quot; class=&quot;headerlink&quot; title=&quot;HTB-Wifinetic&quot;&gt;&lt;/a&gt;HTB-Wifinetic&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
+    
+    
+    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+  </entry>
+  
+  <entry>
     <title>蓝帽杯2021-OnePointerPHP</title>
     <link href="https://wa0er.github.io/posts/48d4210.html"/>
     <id>https://wa0er.github.io/posts/48d4210.html</id>
@@ -69,31 +194,6 @@
     
     
     <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HTB-Wifinetic</title>
-    <link href="https://wa0er.github.io/posts/e48c1386.html"/>
-    <id>https://wa0er.github.io/posts/e48c1386.html</id>
-    <published>2023-09-24T11:00:00.000Z</published>
-    <updated>2023-09-25T09:16:09.564Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;HTB-Wifinetic&quot;&gt;&lt;a href=&quot;#HTB-Wifinetic&quot; class=&quot;headerlink&quot; title=&quot;HTB-Wifinetic&quot;&gt;&lt;/a&gt;HTB-Wifinetic&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
-    
-    
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
     
   </entry>
   
@@ -419,106 +519,6 @@
     
     
     <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HXBCTF2021-easywill</title>
-    <link href="https://wa0er.github.io/posts/291555d9.html"/>
-    <id>https://wa0er.github.io/posts/291555d9.html</id>
-    <published>2023-08-25T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.112Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;HXBCTF2021-easywill&quot;&gt;&lt;a href=&quot;#HXBCTF2021-easywill&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HFCTF2021Quals-Unsetme</title>
-    <link href="https://wa0er.github.io/posts/d89784ec.html"/>
-    <id>https://wa0er.github.io/posts/d89784ec.html</id>
-    <published>2023-08-21T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.111Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;HFCTF2021Quals-Unsetme&quot;&gt;&lt;a href=&quot;#HFCTF2021Quals-Unsetme&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HMGCTF2022-FanWebsite</title>
-    <link href="https://wa0er.github.io/posts/15d824d9.html"/>
-    <id>https://wa0er.github.io/posts/15d824d9.html</id>
-    <published>2023-08-17T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.110Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;HMGCTF2022-FanWebsite&quot;&gt;&lt;a href=&quot;#HMGCTF2022-FanWebsite&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HMGCTF2022-SmartyCalculator</title>
-    <link href="https://wa0er.github.io/posts/e61f7f25.html"/>
-    <id>https://wa0er.github.io/posts/e61f7f25.html</id>
-    <published>2023-08-13T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.108Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;HMGCTF2022-SmartyCalculator&quot;&gt;&lt;a href=&quot;#HMGCTF2022-SmartyCalculator&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
-    
-    
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
     
   </entry>
   
