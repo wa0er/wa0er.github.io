@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HackTheBox">
+    <meta name="keywords" content="HackTheBox,Forgot">
     <meta name="description" content="HackTheBox-Forgot">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 6.0.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -430,8 +430,20 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/HackTheBox/">
-                                <span class="chip bg-color">HackTheBox</span>
+                            <a href="/tags/varnish%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E7%BC%93%E5%AD%98/">
+                                <span class="chip bg-color">varnish反向代理缓存</span>
+                            </a>
+                        
+                            <a href="/tags/%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81%E5%8A%9F%E8%83%BD%E6%8A%95%E6%AF%92/">
+                                <span class="chip bg-color">重置密码功能投毒</span>
+                            </a>
+                        
+                            <a href="/tags/CVE-2022-29216%EF%BC%88%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%EF%BC%89/">
+                                <span class="chip bg-color">CVE-2022-29216（命令执行）</span>
+                            </a>
+                        
+                            <a href="/tags/python%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                                <span class="chip bg-color">python代码审计</span>
                             </a>
                         
                     </div>
@@ -444,6 +456,10 @@
                         
                             <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
                                 靶机
+                            </a>
+                        
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                HackTheBox
                             </a>
                         
                     </div>
@@ -462,21 +478,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-08-31
+                    2023-11-09
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4.4k&nbsp;字
+                    4k&nbsp;字
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    22 分
+                    19 分
                 </div>
                 
 
@@ -504,7 +520,14 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="HTB-Forgot"><a href="#HTB-Forgot" class="headerlink" title="HTB-Forgot"></a>HTB-Forgot</h1><h2 id="信息搜集"><a href="#信息搜集" class="headerlink" title="信息搜集"></a>信息搜集</h2><p>nmap</p>
+                <h1 id="HTB-Forgot"><a href="#HTB-Forgot" class="headerlink" title="HTB-Forgot"></a>HTB-Forgot</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><ol>
+<li>信息搜集暴露信息：<br>①页面源码暴露用户robert-dev-14522；<br>②暴露varnish反向代理缓存可利用点（路径匹配<code>/script</code>）；</li>
+<li>重置密码功能投毒成功修改robert-dev-14522密码，登录网站；</li>
+<li>Varnish缓存欺骗登录admin用户，获取SSH用户diego；</li>
+<li>SSH连接发现关键文件<code>ml_security.py</code>；</li>
+<li>代码审计+CVE-2022-29216命令执行反弹shell获取root权限。</li>
+</ol>
+<h2 id="二、信息搜集"><a href="#二、信息搜集" class="headerlink" title="二、信息搜集"></a>二、信息搜集</h2><p>nmap</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">┌──(root💀kali)-[~/Desktop]
 └─# nmap -sC -sV 10.10.11.188
 Starting Nmap 7.91 ( https://nmap.org ) at 2023-03-06 02:21 EST
@@ -567,38 +590,11 @@ PORT   STATE SERVICE VERSION
 |_http-server-header: Werkzeug/2.1.2 Python/3.8.10
 |_http-title: Login
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
-SF-Port80-TCP:V=7.91%I=7%D=3/6%Time=64059482%P=x86_64-pc-linux-gnu%r(GetRe
-SF:quest,1E3,"HTTP/1\.1\x20302\x20FOUND\r\nServer:\x20Werkzeug/2\.1\.2\x20
-SF:Python/3\.8\.10\r\nDate:\x20Mon,\x2006\x20Mar\x202023\x2007:21:38\x20GM
-SF:T\r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nContent-Length:\x2
-SF:0219\r\nLocation:\x20http://127\.0\.0\.1\r\nX-Varnish:\x20493852\r\nAge
-SF::\x200\r\nVia:\x201\.1\x20varnish\x20\(Varnish/6\.2\)\r\nConnection:\x2
-SF:0close\r\n\r\n&lt;!doctype\x20html&gt;\n&lt;html\x20lang=en&gt;\n&lt;title&gt;Redirecting
-SF:\.\.\.&lt;/title&gt;\n&lt;h1&gt;Redirecting\.\.\.&lt;/h1&gt;\n&lt;p&gt;You\x20should\x20be\x20r
-SF:edirected\x20automatically\x20to\x20the\x20target\x20URL:\x20&lt;a\x20href
-SF:=\"http://127\.0\.0\.1\"&gt;http://127\.0\.0\.1&lt;/a&gt;\.\x20If\x20not,\x20cli
-SF:ck\x20the\x20link\.\n")%r(HTTPOptions,118,"HTTP/1\.1\x20200\x20OK\r\nSe
-SF:rver:\x20Werkzeug/2\.1\.2\x20Python/3\.8\.10\r\nDate:\x20Mon,\x2006\x20
-SF:Mar\x202023\x2007:21:40\x20GMT\r\nContent-Type:\x20text/html;\x20charse
-SF:t=utf-8\r\nAllow:\x20OPTIONS,\x20GET,\x20HEAD\r\nContent-Length:\x200\r
-SF:\nX-Varnish:\x20264229\r\nAge:\x200\r\nVia:\x201\.1\x20varnish\x20\(Var
-SF:nish/6\.2\)\r\nAccept-Ranges:\x20bytes\r\nConnection:\x20close\r\n\r\n"
-SF:)%r(RTSPRequest,1C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\n\r\n")%r(Four
-SF:OhFourRequest,1C7,"HTTP/1\.1\x20404\x20NOT\x20FOUND\r\nServer:\x20Werkz
-SF:eug/2\.1\.2\x20Python/3\.8\.10\r\nDate:\x20Mon,\x2006\x20Mar\x202023\x2
-SF:007:20:37\x20GMT\r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nCon
-SF:tent-Length:\x20207\r\nX-Varnish:\x20493857\x20493844\r\nAge:\x2071\r\n
-SF:Via:\x201\.1\x20varnish\x20\(Varnish/6\.2\)\r\nConnection:\x20close\r\n
-SF:\r\n&lt;!doctype\x20html&gt;\n&lt;html\x20lang=en&gt;\n&lt;title&gt;404\x20Not\x20Found&lt;/
-SF:title&gt;\n&lt;h1&gt;Not\x20Found&lt;/h1&gt;\n&lt;p&gt;The\x20requested\x20URL\x20was\x20not
-SF:\x20found\x20on\x20the\x20server\.\x20If\x20you\x20entered\x20the\x20UR
-SF:L\x20manually\x20please\x20check\x20your\x20spelling\x20and\x20try\x20a
-SF:gain\.&lt;/p&gt;\n")%r(SIPOptions,1C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\n\
-SF:r\n");
+......
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 190.69 seconds<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Nmap done: 1 IP address (1 host up) scanned in 190.69 seconds<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>开放端口：22（SSH）、80（HTTP），并且观察到http-server-header是Werkzeug/2.1.2和Python/3.8.10，那么就极有可能是Flask框架</p>
 <p>访问<code>10.10.11.188</code>，是个登录页面，可以爆破，但这不是上策</p>
@@ -664,7 +660,7 @@ by Ben "epi" Risher 🤓                 ver: 2.7.3
 <p>回到<code>/forgot</code>页面，输入刚才发现的用户名<code>robert-dev-14522</code>，看提示，应该是有效用户，但重置密码的链接发送到用户收件箱</p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230306165337667.png" style="zoom:67%;">
 
-<h2 id="重置密码功能投毒"><a href="#重置密码功能投毒" class="headerlink" title="重置密码功能投毒"></a>重置密码功能投毒</h2><p>参考<a target="_blank" rel="noopener" href="https://portswigger.net/web-security/host-header/exploiting/password-reset-poisoning">https://portswigger.net/web-security/host-header/exploiting/password-reset-poisoning</a></p>
+<h2 id="三、重置密码功能投毒"><a href="#三、重置密码功能投毒" class="headerlink" title="三、重置密码功能投毒"></a>三、重置密码功能投毒</h2><p>参考<a target="_blank" rel="noopener" href="https://portswigger.net/web-security/host-header/exploiting/password-reset-poisoning">https://portswigger.net/web-security/host-header/exploiting/password-reset-poisoning</a></p>
 <p>盘一盘重置密码的逻辑：</p>
 <p>第一步，用户输入用户名，提交重置密码请求；</p>
 <p>第二步，服务器检查用户名是否存在，然后生成一个临时token，连带token返回一个重置密码的链接到用户的<code>inbox</code>；</p>
@@ -694,7 +690,7 @@ Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
 <p>却发现<code>Tickets(escalated)</code>无法点击，有点可疑，F12查看有目录<code>/admin_tickets</code>，已提权的用户应该给的是admin权限，那么Diego用户应该就被提升到admin权限了，那么我们就可以尝试以admin身份登录网站，从而看到Diego用户的用户名密码，也就是SSH的用户名密码。F12把class值删除或者直接访问<code>/admin_tickets</code>目录都无效，会跳转到<code>http://10.10.11.188/home?err=ACCESS_DENIED</code></p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230307141914539.png" style="zoom: 80%;">
 
-<h2 id="web缓存欺骗"><a href="#web缓存欺骗" class="headerlink" title="web缓存欺骗"></a>web缓存欺骗</h2><p>回头看nmap的扫描结果，HTTP响应有两个罕见的字段<code>X-Varnish</code>和<code>Via</code></p>
+<h2 id="四、web缓存欺骗"><a href="#四、web缓存欺骗" class="headerlink" title="四、web缓存欺骗"></a>四、web缓存欺骗</h2><p>回头看nmap的扫描结果，HTTP响应有两个罕见的字段<code>X-Varnish</code>和<code>Via</code></p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">HTTP/1.1 200 OK
 Server: Werkzeug/2.1.2 Python/3.8.10
 Date: Mon, 06 Mar 2023 07:21:40 GMT
@@ -779,7 +775,7 @@ dCb#1!x0%gjq<span aria-hidden="true" class="line-numbers-rows"><span></span><spa
 
 <p>ssh连上去</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230307152413918.png"></p>
-<h2 id="权限提升"><a href="#权限提升" class="headerlink" title="权限提升"></a>权限提升</h2><p>前面知道diego用户已被提权，所以应该是有sudo权限，可以执行<code>sudo -l</code>看一下diego用户权限，发现有个<code>/opt/security/ml_security.py</code>可以执行</p>
+<h2 id="五、权限提升"><a href="#五、权限提升" class="headerlink" title="五、权限提升"></a>五、权限提升</h2><p>前面知道diego用户已被提权，所以应该是有sudo权限，可以执行<code>sudo -l</code>看一下diego用户权限，发现有个<code>/opt/security/ml_security.py</code>可以执行</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230307152612681.png"></p>
 <p>看一下内容</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token comment">#!/usr/bin/python3</span>
@@ -1007,13 +1003,6 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230307162318369.png"></p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230307161312862.png" style="zoom:67%;">
 
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>信息搜集暴露信息：<br>①页面源码暴露用户robert-dev-14522；<br>②暴露varnish反向代理缓存可利用点（路径匹配<code>/script</code>）；</li>
-<li>重置密码功能投毒成功修改robert-dev-14522密码，登录网站；</li>
-<li>Varnish缓存欺骗登录admin用户，获取SSH用户diego；</li>
-<li>SSH连接发现关键文件<code>ml_security.py</code>；</li>
-<li>代码审计+CVE-2022-29216命令执行反弹shell获取root权限。</li>
-</ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://0xdf.gitlab.io/2023/03/04/htb-forgot.html">https://0xdf.gitlab.io/2023/03/04/htb-forgot.html</a></p>
 <p><a target="_blank" rel="noopener" href="https://infosecwriteups.com/forgot-hack-the-box-walkthrough-htb-e571fd151f9a">https://infosecwriteups.com/forgot-hack-the-box-walkthrough-htb-e571fd151f9a</a></p>
 <p><a target="_blank" rel="noopener" href="https://www.usenix.org/conference/usenixsecurity20/presentation/mirheidari">https://www.usenix.org/conference/usenixsecurity20/presentation/mirheidari</a></p>
@@ -1081,8 +1070,20 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/HackTheBox/">
-                                    <span class="chip bg-color">HackTheBox</span>
+                                <a href="/tags/varnish%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E7%BC%93%E5%AD%98/">
+                                    <span class="chip bg-color">varnish反向代理缓存</span>
+                                </a>
+                            
+                                <a href="/tags/%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81%E5%8A%9F%E8%83%BD%E6%8A%95%E6%AF%92/">
+                                    <span class="chip bg-color">重置密码功能投毒</span>
+                                </a>
+                            
+                                <a href="/tags/CVE-2022-29216%EF%BC%88%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%EF%BC%89/">
+                                    <span class="chip bg-color">CVE-2022-29216（命令执行）</span>
+                                </a>
+                            
+                                <a href="/tags/python%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                                    <span class="chip bg-color">python代码审计</span>
                                 </a>
                             
                         </div>
@@ -1616,6 +1617,10 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1623,8 +1628,20 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/Swagger-UI/">
+                        <span class="chip bg-color">Swagger UI</span>
+                    </a>
+                    
+                    <a href="/tags/SNMP/">
+                        <span class="chip bg-color">SNMP</span>
+                    </a>
+                    
+                    <a href="/tags/JWT%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/">
+                        <span class="chip bg-color">JWT命令执行</span>
+                    </a>
+                    
+                    <a href="/tags/PostgreSQL%E6%95%B0%E6%8D%AE%E5%BA%93/">
+                        <span class="chip bg-color">PostgreSQL数据库</span>
                     </a>
                     
                 </div>
@@ -1664,6 +1681,10 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1671,8 +1692,32 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/LFI/">
+                        <span class="chip bg-color">LFI</span>
+                    </a>
+                    
+                    <a href="/tags/Nginx/">
+                        <span class="chip bg-color">Nginx</span>
+                    </a>
+                    
+                    <a href="/tags/JWT%E4%BC%AA%E9%80%A0/">
+                        <span class="chip bg-color">JWT伪造</span>
+                    </a>
+                    
+                    <a href="/tags/SSRF/">
+                        <span class="chip bg-color">SSRF</span>
+                    </a>
+                    
+                    <a href="/tags/awk%E5%91%BD%E4%BB%A4/">
+                        <span class="chip bg-color">awk命令</span>
+                    </a>
+                    
+                    <a href="/tags/sed%E5%91%BD%E4%BB%A4RCE/">
+                        <span class="chip bg-color">sed命令RCE</span>
+                    </a>
+                    
+                    <a href="/tags/mail%E5%91%BD%E4%BB%A4/">
+                        <span class="chip bg-color">mail命令</span>
                     </a>
                     
                 </div>
@@ -1860,7 +1905,7 @@ diego@forgot:~$ chmod +x /tmp/wa0er_rev.sh<span aria-hidden="true" class="line-n
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">62.4k&nbsp;字</span>
+                        class="white-color">61.4k&nbsp;字</span>
             
             
 

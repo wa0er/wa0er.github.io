@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HackTheBox">
+    <meta name="keywords" content="HackTheBox,Awkward">
     <meta name="description" content="HackTheBox-Awkward">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 6.0.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -430,8 +430,32 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/HackTheBox/">
-                                <span class="chip bg-color">HackTheBox</span>
+                            <a href="/tags/LFI/">
+                                <span class="chip bg-color">LFI</span>
+                            </a>
+                        
+                            <a href="/tags/Nginx/">
+                                <span class="chip bg-color">Nginx</span>
+                            </a>
+                        
+                            <a href="/tags/JWT%E4%BC%AA%E9%80%A0/">
+                                <span class="chip bg-color">JWT伪造</span>
+                            </a>
+                        
+                            <a href="/tags/SSRF/">
+                                <span class="chip bg-color">SSRF</span>
+                            </a>
+                        
+                            <a href="/tags/awk%E5%91%BD%E4%BB%A4/">
+                                <span class="chip bg-color">awk命令</span>
+                            </a>
+                        
+                            <a href="/tags/sed%E5%91%BD%E4%BB%A4RCE/">
+                                <span class="chip bg-color">sed命令RCE</span>
+                            </a>
+                        
+                            <a href="/tags/mail%E5%91%BD%E4%BB%A4/">
+                                <span class="chip bg-color">mail命令</span>
                             </a>
                         
                     </div>
@@ -444,6 +468,10 @@
                         
                             <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
                                 靶机
+                            </a>
+                        
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                HackTheBox
                             </a>
                         
                     </div>
@@ -462,7 +490,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-08-31
+                    2023-11-09
                 </div>
                 
 
@@ -504,7 +532,17 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="HTB-Awkward"><a href="#HTB-Awkward" class="headerlink" title="HTB-Awkward"></a>HTB-Awkward</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>Nmap</p>
+                <h1 id="HTB-Awkward"><a href="#HTB-Awkward" class="headerlink" title="HTB-Awkward"></a>HTB-Awkward</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><ol>
+<li>信息收集发现JWT和SSRF；</li>
+<li>SSRF发现站点API；</li>
+<li>审计API源码，发现可伪造JWT执行awk命令实现LFI拿到bean用户ssh；</li>
+<li>连上ssh找到购物车源码，nginx敏感文件泄露找到admin账户；</li>
+<li>审计购物车源码，发现删除购物车功能可利用sed命令实现RCE；</li>
+<li>RCE反弹shell获取www-data用户权限；</li>
+<li>执行pspy64发现mail命令及其目标文件leave_requests.csv；</li>
+<li>利用mail命令和leave_requests.csv反弹shell获取root权限。</li>
+</ol>
+<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>Nmap</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">┌──(root💀kali)-[~/桌面]
 └─# nmap -sC -sV 10.10.11.185          
 Starting Nmap 7.91 ( https://nmap.org ) at 2023-02-16 21:53 EST
@@ -623,7 +661,7 @@ chris123<span aria-hidden="true" class="line-numbers-rows"><span></span><span></
 
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230303115143339.png"></p>
 <p>获取到JWT token的secret值为<code>123beany123</code>，用<code>JWT Debugger</code>尝试，暂时没发现什么</p>
-<h2 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h2><p>想起刚才发现的另一个API，<code>api/store-status?url="http://store.hat-valley.htb"</code>，可能存在SSRF</p>
+<h2 id="三、SSRF"><a href="#三、SSRF" class="headerlink" title="三、SSRF"></a>三、SSRF</h2><p>想起刚才发现的另一个API，<code>api/store-status?url="http://store.hat-valley.htb"</code>，可能存在SSRF</p>
 <p>尝试<code>http://127.0.0.1:80</code>，被重定向到<code>http://store.hat-valley.htb</code>，证实存在SSRF</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">http://hat-valley.htb/api/store-status?url="http://127.0.0.1:80"--&gt;http://store.hat-valley.htb<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
@@ -641,7 +679,7 @@ Staff Details (/api/staff-details)<span aria-hidden="true" class="line-numbers-r
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230303133933056.png"></p>
 <p>8080页面空白，看源码发现hat-valley不能正常工作，要求开启JavaScript才能正常工作，没什么用</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230303134214112.png"></p>
-<h2 id="LFI"><a href="#LFI" class="headerlink" title="LFI"></a>LFI</h2><p>在其中一个API源码发现漏洞点，在28行exec函数里，有用户可控的参数user，通过操纵参数user，执行<a target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-comm-awk.html">awk命令</a>读取文件（PS：题目名称Awkward原来体现在这）。而user值的获取，往前追溯代码，发现是通过decodedToken，然后取username字段得到的。</p>
+<h2 id="四、LFI"><a href="#四、LFI" class="headerlink" title="四、LFI"></a>四、LFI</h2><p>在其中一个API源码发现漏洞点，在28行exec函数里，有用户可控的参数user，通过操纵参数user，执行<a target="_blank" rel="noopener" href="https://www.runoob.com/linux/linux-comm-awk.html">awk命令</a>读取文件（PS：题目名称Awkward原来体现在这）。而user值的获取，往前追溯代码，发现是通过decodedToken，然后取username字段得到的。</p>
 <p>再往前追溯到头，发现是如下图所示的传递链，TOKEN_SECRET前面已经获得，值为<code>123beany123</code>，所以我们就可以通过JWT伪造请求头中Cookie字段的token值，从而操纵user值读取文件</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230303161247753.png"></p>
 <pre class="line-numbers language-apl" data-language="apl"><code class="language-apl">app<span class="token dyadic-operator operator">.</span>get<span class="token punctuation">(</span><span class="token string">'/api/all-leave'</span><span class="token function">,</span> <span class="token punctuation">(</span>req<span class="token function">,</span> res<span class="token punctuation">)</span> <span class="token function">=</span><span class="token function">&gt;</span> <span class="token dfn builtin">{</span>
@@ -910,7 +948,7 @@ drwxr-xr-x  2 1001 1001 4096 Sep 15 07:35 Videos<span aria-hidden="true" class="
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230303172108467.png"></p>
 <p>SSH连上去</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230303172702700.png"></p>
-<h2 id="权限提升"><a href="#权限提升" class="headerlink" title="权限提升"></a>权限提升</h2><p>查看host文件</p>
+<h2 id="五、权限提升"><a href="#五、权限提升" class="headerlink" title="五、权限提升"></a>五、权限提升</h2><p>查看host文件</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">bean@awkward:~$ cat /etc/hosts
 127.0.0.1       localhost hat-valley.htb store.hat-valley.htb
 127.0.0.1       awkward
@@ -1088,7 +1126,7 @@ To test cart functionality, create a new cart file and add items to it, and see 
 
 <span class="token delimiter important">?&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="RCE"><a href="#RCE" class="headerlink" title="RCE"></a>RCE</h2><p>审计，其中在删除购物车信息的时候，会执行如下代码</p>
+<h2 id="六、RCE"><a href="#六、RCE" class="headerlink" title="六、RCE"></a>六、RCE</h2><p>审计，其中在删除购物车信息的时候，会执行如下代码</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">system("sed -i '/item_id={$item_id}/d' {$STORE_HOME}cart/{$user_id}");
 注：
 '/item_id={$item_id}/d'				#删除item_id={$item_id}的行
@@ -1160,16 +1198,6 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230304115919562.png"></p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230304115938244.png"></p>
 <p>Over！</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li>信息收集发现JWT和SSRF；</li>
-<li>SSRF发现站点API；</li>
-<li>审计API源码，发现可伪造JWT执行awk命令实现LFI拿到bean用户ssh；</li>
-<li>连上ssh找到购物车源码，nginx敏感文件泄露找到admin账户；</li>
-<li>审计购物车源码，发现删除购物车功能可利用sed命令实现RCE；</li>
-<li>RCE反弹shell获取www-data用户权限；</li>
-<li>执行pspy64发现mail命令及其目标文件leave_requests.csv；</li>
-<li>利用mail命令和leave_requests.csv反弹shell获取root权限。</li>
-</ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://0xdedinfosec.vercel.app/blog/hackthebox-awkward-writeup#cracking-jwt-secret">https://0xdedinfosec.vercel.app/blog/hackthebox-awkward-writeup#cracking-jwt-secret</a></p>
 <p><a target="_blank" rel="noopener" href="https://systemweakness.com/hack-the-box-htb-writeup-awkward-3542681d9795">https://systemweakness.com/hack-the-box-htb-writeup-awkward-3542681d9795</a></p>
 <p><a target="_blank" rel="noopener" href="https://gtfobins.github.io/#sed">https://gtfobins.github.io/#sed</a></p>
@@ -1239,8 +1267,32 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/HackTheBox/">
-                                    <span class="chip bg-color">HackTheBox</span>
+                                <a href="/tags/LFI/">
+                                    <span class="chip bg-color">LFI</span>
+                                </a>
+                            
+                                <a href="/tags/Nginx/">
+                                    <span class="chip bg-color">Nginx</span>
+                                </a>
+                            
+                                <a href="/tags/JWT%E4%BC%AA%E9%80%A0/">
+                                    <span class="chip bg-color">JWT伪造</span>
+                                </a>
+                            
+                                <a href="/tags/SSRF/">
+                                    <span class="chip bg-color">SSRF</span>
+                                </a>
+                            
+                                <a href="/tags/awk%E5%91%BD%E4%BB%A4/">
+                                    <span class="chip bg-color">awk命令</span>
+                                </a>
+                            
+                                <a href="/tags/sed%E5%91%BD%E4%BB%A4RCE/">
+                                    <span class="chip bg-color">sed命令RCE</span>
+                                </a>
+                            
+                                <a href="/tags/mail%E5%91%BD%E4%BB%A4/">
+                                    <span class="chip bg-color">mail命令</span>
                                 </a>
                             
                         </div>
@@ -1774,6 +1826,10 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1781,8 +1837,20 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/varnish%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E7%BC%93%E5%AD%98/">
+                        <span class="chip bg-color">varnish反向代理缓存</span>
+                    </a>
+                    
+                    <a href="/tags/%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81%E5%8A%9F%E8%83%BD%E6%8A%95%E6%AF%92/">
+                        <span class="chip bg-color">重置密码功能投毒</span>
+                    </a>
+                    
+                    <a href="/tags/CVE-2022-29216%EF%BC%88%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%EF%BC%89/">
+                        <span class="chip bg-color">CVE-2022-29216（命令执行）</span>
+                    </a>
+                    
+                    <a href="/tags/python%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                        <span class="chip bg-color">python代码审计</span>
                     </a>
                     
                 </div>
@@ -1822,6 +1890,10 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1829,8 +1901,24 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/Tiny-File-Manager%E5%BC%B1%E5%8F%A3%E4%BB%A4/">
+                        <span class="chip bg-color">Tiny File Manager弱口令</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+                        <span class="chip bg-color">文件上传</span>
+                    </a>
+                    
+                    <a href="/tags/ngnix/">
+                        <span class="chip bg-color">ngnix</span>
+                    </a>
+                    
+                    <a href="/tags/WebSocket%E5%AE%9E%E7%8E%B0SQL%E6%B3%A8%E5%85%A5/">
+                        <span class="chip bg-color">WebSocket实现SQL注入</span>
+                    </a>
+                    
+                    <a href="/tags/doas%E5%92%8Cdstat%E8%81%94%E5%8A%A8%E6%8F%90%E6%9D%83/">
+                        <span class="chip bg-color">doas和dstat联动提权</span>
                     </a>
                     
                 </div>
@@ -2018,7 +2106,7 @@ www-data@awkward:~/private$<span aria-hidden="true" class="line-numbers-rows"><s
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">62.4k&nbsp;字</span>
+                        class="white-color">61.4k&nbsp;字</span>
             
             
 

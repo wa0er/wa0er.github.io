@@ -6,7 +6,7 @@
   <link href="https://wa0er.github.io/atom.xml" rel="self"/>
   
   <link href="https://wa0er.github.io/"/>
-  <updated>2023-11-06T10:07:27.207Z</updated>
+  <updated>2023-11-08T07:26:41.108Z</updated>
   <id>https://wa0er.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://wa0er.github.io/posts/5f6105d4.html"/>
     <id>https://wa0er.github.io/posts/5f6105d4.html</id>
     <published>2023-10-28T11:00:00.000Z</published>
-    <updated>2023-11-06T10:07:27.207Z</updated>
+    <updated>2023-11-08T07:26:41.108Z</updated>
     
     
       
@@ -36,8 +36,14 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="Flask模板注入" scheme="https://wa0er.github.io/tags/Flask%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/"/>
+    
+    <category term="Rust计划任务提权" scheme="https://wa0er.github.io/tags/Rust%E8%AE%A1%E5%88%92%E4%BB%BB%E5%8A%A1%E6%8F%90%E6%9D%83/"/>
+    
+    <category term="firejail提权" scheme="https://wa0er.github.io/tags/firejail%E6%8F%90%E6%9D%83/"/>
     
   </entry>
   
@@ -46,7 +52,7 @@
     <link href="https://wa0er.github.io/posts/d4f5920f.html"/>
     <id>https://wa0er.github.io/posts/d4f5920f.html</id>
     <published>2023-10-21T11:00:00.000Z</published>
-    <updated>2023-11-06T10:07:04.230Z</updated>
+    <updated>2023-11-08T07:28:22.866Z</updated>
     
     
       
@@ -61,8 +67,14 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="PostgreSQL注入" scheme="https://wa0er.github.io/tags/PostgreSQL%E6%B3%A8%E5%85%A5/"/>
+    
+    <category term="ssh公钥伪造" scheme="https://wa0er.github.io/tags/ssh%E5%85%AC%E9%92%A5%E4%BC%AA%E9%80%A0/"/>
+    
+    <category term="Jupyter服务" scheme="https://wa0er.github.io/tags/Jupyter%E6%9C%8D%E5%8A%A1/"/>
     
   </entry>
   
@@ -71,7 +83,7 @@
     <link href="https://wa0er.github.io/posts/1e9a0fae.html"/>
     <id>https://wa0er.github.io/posts/1e9a0fae.html</id>
     <published>2023-10-21T04:00:00.000Z</published>
-    <updated>2023-11-06T10:10:17.192Z</updated>
+    <updated>2023-11-09T04:59:37.219Z</updated>
     
     
       
@@ -89,11 +101,11 @@
     <category term="细读经典" scheme="https://wa0er.github.io/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/"/>
     
     
-    <category term="细读经典" scheme="https://wa0er.github.io/tags/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/"/>
-    
     <category term="Log4j2" scheme="https://wa0er.github.io/tags/Log4j2/"/>
     
     <category term="JNDI注入" scheme="https://wa0er.github.io/tags/JNDI%E6%B3%A8%E5%85%A5/"/>
+    
+    <category term="CVE-2021-44228（Log4j2）" scheme="https://wa0er.github.io/tags/CVE-2021-44228%EF%BC%88Log4j2%EF%BC%89/"/>
     
   </entry>
   
@@ -102,7 +114,7 @@
     <link href="https://wa0er.github.io/posts/3e4c0ff8.html"/>
     <id>https://wa0er.github.io/posts/3e4c0ff8.html</id>
     <published>2023-10-14T11:00:00.000Z</published>
-    <updated>2023-11-06T10:05:49.379Z</updated>
+    <updated>2023-11-08T07:30:31.528Z</updated>
     
     
       
@@ -117,8 +129,14 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="git源码泄露" scheme="https://wa0er.github.io/tags/git%E6%BA%90%E7%A0%81%E6%B3%84%E9%9C%B2/"/>
+    
+    <category term="ImageMagick LFI" scheme="https://wa0er.github.io/tags/ImageMagick-LFI/"/>
+    
+    <category term="binwalk RCE提权" scheme="https://wa0er.github.io/tags/binwalk-RCE%E6%8F%90%E6%9D%83/"/>
     
   </entry>
   
@@ -127,7 +145,7 @@
     <link href="https://wa0er.github.io/posts/ec5f74de.html"/>
     <id>https://wa0er.github.io/posts/ec5f74de.html</id>
     <published>2023-10-06T11:00:00.000Z</published>
-    <updated>2023-11-06T10:05:13.765Z</updated>
+    <updated>2023-11-08T07:32:06.489Z</updated>
     
     
       
@@ -142,8 +160,14 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="LFI" scheme="https://wa0er.github.io/tags/LFI/"/>
+    
+    <category term="redis未授权" scheme="https://wa0er.github.io/tags/redis%E6%9C%AA%E6%8E%88%E6%9D%83/"/>
+    
+    <category term="python格式化字符串漏洞" scheme="https://wa0er.github.io/tags/python%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E/"/>
     
   </entry>
   
@@ -152,7 +176,7 @@
     <link href="https://wa0er.github.io/posts/e48c1386.html"/>
     <id>https://wa0er.github.io/posts/e48c1386.html</id>
     <published>2023-09-30T11:00:00.000Z</published>
-    <updated>2023-11-06T10:03:36.431Z</updated>
+    <updated>2023-11-08T07:32:51.618Z</updated>
     
     
       
@@ -167,8 +191,12 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="无线网络" scheme="https://wa0er.github.io/tags/%E6%97%A0%E7%BA%BF%E7%BD%91%E7%BB%9C/"/>
+    
+    <category term="信息泄露" scheme="https://wa0er.github.io/tags/%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2/"/>
     
   </entry>
   
@@ -177,7 +205,7 @@
     <link href="https://wa0er.github.io/posts/48d4210.html"/>
     <id>https://wa0er.github.io/posts/48d4210.html</id>
     <published>2023-09-26T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.109Z</updated>
+    <updated>2023-11-09T04:09:32.005Z</updated>
     
     
       
@@ -193,7 +221,17 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="基础反序列化" scheme="https://wa0er.github.io/tags/%E5%9F%BA%E7%A1%80%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"/>
+    
+    <category term="PHP数组key溢出" scheme="https://wa0er.github.io/tags/PHP%E6%95%B0%E7%BB%84key%E6%BA%A2%E5%87%BA/"/>
+    
+    <category term="open_basedir绕过" scheme="https://wa0er.github.io/tags/open-basedir%E7%BB%95%E8%BF%87/"/>
+    
+    <category term="SSRF攻击FPM服务" scheme="https://wa0er.github.io/tags/SSRF%E6%94%BB%E5%87%BBFPM%E6%9C%8D%E5%8A%A1/"/>
+    
+    <category term="被动FTP" scheme="https://wa0er.github.io/tags/%E8%A2%AB%E5%8A%A8FTP/"/>
+    
+    <category term="SUID权限" scheme="https://wa0er.github.io/tags/SUID%E6%9D%83%E9%99%90/"/>
     
   </entry>
   
@@ -202,7 +240,7 @@
     <link href="https://wa0er.github.io/posts/e1e0c79d.html"/>
     <id>https://wa0er.github.io/posts/e1e0c79d.html</id>
     <published>2023-09-23T11:00:00.000Z</published>
-    <updated>2023-09-25T05:21:07.666Z</updated>
+    <updated>2023-11-08T07:33:40.069Z</updated>
     
     
       
@@ -217,8 +255,12 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="LaTeX公式" scheme="https://wa0er.github.io/tags/LaTeX%E5%85%AC%E5%BC%8F/"/>
+    
+    <category term="Apache" scheme="https://wa0er.github.io/tags/Apache/"/>
     
   </entry>
   
@@ -227,7 +269,7 @@
     <link href="https://wa0er.github.io/posts/1582c14.html"/>
     <id>https://wa0er.github.io/posts/1582c14.html</id>
     <published>2023-09-22T11:00:00.000Z</published>
-    <updated>2023-09-26T02:45:59.719Z</updated>
+    <updated>2023-11-09T04:11:16.626Z</updated>
     
     
       
@@ -243,7 +285,9 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="文件上传bypass" scheme="https://wa0er.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0bypass/"/>
+    
+    <category term="php代码审计" scheme="https://wa0er.github.io/tags/php%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -252,7 +296,7 @@
     <link href="https://wa0er.github.io/posts/2cfe146d.html"/>
     <id>https://wa0er.github.io/posts/2cfe146d.html</id>
     <published>2023-09-20T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.104Z</updated>
+    <updated>2023-11-09T04:11:26.844Z</updated>
     
     
       
@@ -268,7 +312,11 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="SSRF" scheme="https://wa0er.github.io/tags/SSRF/"/>
+    
+    <category term="URL重定向" scheme="https://wa0er.github.io/tags/URL%E9%87%8D%E5%AE%9A%E5%90%91/"/>
+    
+    <category term="go代码审计" scheme="https://wa0er.github.io/tags/go%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -277,7 +325,7 @@
     <link href="https://wa0er.github.io/posts/1e912fcd.html"/>
     <id>https://wa0er.github.io/posts/1e912fcd.html</id>
     <published>2023-09-18T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.104Z</updated>
+    <updated>2023-11-09T04:11:30.773Z</updated>
     
     
       
@@ -293,7 +341,9 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="文件上传bypass" scheme="https://wa0er.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0bypass/"/>
+    
+    <category term="php代码审计" scheme="https://wa0er.github.io/tags/php%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -302,7 +352,7 @@
     <link href="https://wa0er.github.io/posts/cbbc48d2.html"/>
     <id>https://wa0er.github.io/posts/cbbc48d2.html</id>
     <published>2023-09-16T11:00:00.000Z</published>
-    <updated>2023-09-25T05:21:07.666Z</updated>
+    <updated>2023-11-09T02:35:40.060Z</updated>
     
     
       
@@ -317,8 +367,12 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="gRPC服务" scheme="https://wa0er.github.io/tags/gRPC%E6%9C%8D%E5%8A%A1/"/>
+    
+    <category term="CVE-2023-0297（pyLoad服务RCE）" scheme="https://wa0er.github.io/tags/CVE-2023-0297%EF%BC%88pyLoad%E6%9C%8D%E5%8A%A1RCE%EF%BC%89/"/>
     
   </entry>
   
@@ -327,7 +381,7 @@
     <link href="https://wa0er.github.io/posts/3e3db684.html"/>
     <id>https://wa0er.github.io/posts/3e3db684.html</id>
     <published>2023-09-14T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.098Z</updated>
+    <updated>2023-11-09T04:09:14.342Z</updated>
     
     
       
@@ -343,7 +397,11 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="任意代码执行" scheme="https://wa0er.github.io/tags/%E4%BB%BB%E6%84%8F%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/"/>
+    
+    <category term="任意文件下载" scheme="https://wa0er.github.io/tags/%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD/"/>
+    
+    <category term="目录遍历" scheme="https://wa0er.github.io/tags/%E7%9B%AE%E5%BD%95%E9%81%8D%E5%8E%86/"/>
     
   </entry>
   
@@ -352,7 +410,7 @@
     <link href="https://wa0er.github.io/posts/b53475ea.html"/>
     <id>https://wa0er.github.io/posts/b53475ea.html</id>
     <published>2023-09-10T11:00:00.000Z</published>
-    <updated>2023-09-26T02:38:42.514Z</updated>
+    <updated>2023-11-09T04:11:35.646Z</updated>
     
     
       
@@ -368,7 +426,13 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="目录遍历" scheme="https://wa0er.github.io/tags/%E7%9B%AE%E5%BD%95%E9%81%8D%E5%8E%86/"/>
+    
+    <category term="XMLDecoder反序列化" scheme="https://wa0er.github.io/tags/XMLDecoder%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/"/>
+    
+    <category term="java反编译" scheme="https://wa0er.github.io/tags/java%E5%8F%8D%E7%BC%96%E8%AF%91/"/>
+    
+    <category term="java代码审计" scheme="https://wa0er.github.io/tags/java%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -377,7 +441,7 @@
     <link href="https://wa0er.github.io/posts/1ca70420.html"/>
     <id>https://wa0er.github.io/posts/1ca70420.html</id>
     <published>2023-09-09T11:00:00.000Z</published>
-    <updated>2023-09-25T05:21:07.665Z</updated>
+    <updated>2023-11-09T02:35:23.102Z</updated>
     
     
       
@@ -392,8 +456,14 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="mysql数据库" scheme="https://wa0er.github.io/tags/mysql%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+    <category term="CVE-2022-46169（Cacti框架命令注入）" scheme="https://wa0er.github.io/tags/CVE-2022-46169%EF%BC%88Cacti%E6%A1%86%E6%9E%B6%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%EF%BC%89/"/>
+    
+    <category term="CVE-2021-41091（docker提权）" scheme="https://wa0er.github.io/tags/CVE-2021-41091%EF%BC%88docker%E6%8F%90%E6%9D%83%EF%BC%89/"/>
     
   </entry>
   
@@ -402,7 +472,7 @@
     <link href="https://wa0er.github.io/posts/9a2f1a58.html"/>
     <id>https://wa0er.github.io/posts/9a2f1a58.html</id>
     <published>2023-09-05T11:00:00.000Z</published>
-    <updated>2023-09-26T02:35:51.521Z</updated>
+    <updated>2023-11-09T04:11:39.171Z</updated>
     
     
       
@@ -418,7 +488,7 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="js代码审计" scheme="https://wa0er.github.io/tags/js%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -427,7 +497,7 @@
     <link href="https://wa0er.github.io/posts/27ec25c5.html"/>
     <id>https://wa0er.github.io/posts/27ec25c5.html</id>
     <published>2023-09-02T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.113Z</updated>
+    <updated>2023-11-09T04:11:42.849Z</updated>
     
     
       
@@ -443,7 +513,9 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="XSS+SSRF组合拳" scheme="https://wa0er.github.io/tags/XSS-SSRF%E7%BB%84%E5%90%88%E6%8B%B3/"/>
+    
+    <category term="TypeScript代码审计" scheme="https://wa0er.github.io/tags/TypeScript%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -452,7 +524,7 @@
     <link href="https://wa0er.github.io/posts/5cae8651.html"/>
     <id>https://wa0er.github.io/posts/5cae8651.html</id>
     <published>2023-08-31T11:00:00.000Z</published>
-    <updated>2023-08-31T08:07:03.823Z</updated>
+    <updated>2023-11-09T04:14:45.924Z</updated>
     
     
       
@@ -467,8 +539,18 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="LFI" scheme="https://wa0er.github.io/tags/LFI/"/>
+    
+    <category term="Nginx" scheme="https://wa0er.github.io/tags/Nginx/"/>
+    
+    <category term="Neo4j注入" scheme="https://wa0er.github.io/tags/Neo4j%E6%B3%A8%E5%85%A5/"/>
+    
+    <category term="pip download代码执行" scheme="https://wa0er.github.io/tags/pip-download%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/"/>
+    
+    <category term="python代码审计" scheme="https://wa0er.github.io/tags/python%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   
@@ -477,7 +559,7 @@
     <link href="https://wa0er.github.io/posts/f7c9127f.html"/>
     <id>https://wa0er.github.io/posts/f7c9127f.html</id>
     <published>2023-08-29T11:00:00.000Z</published>
-    <updated>2023-09-26T02:26:08.114Z</updated>
+    <updated>2023-11-09T04:11:46.761Z</updated>
     
     
       
@@ -493,7 +575,9 @@
     <category term="CTF" scheme="https://wa0er.github.io/categories/CTF/"/>
     
     
-    <category term="CTF" scheme="https://wa0er.github.io/tags/CTF/"/>
+    <category term="TypeScript代码审计" scheme="https://wa0er.github.io/tags/TypeScript%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
+    
+    <category term="MongoDB盲注" scheme="https://wa0er.github.io/tags/MongoDB%E7%9B%B2%E6%B3%A8/"/>
     
   </entry>
   
@@ -502,7 +586,7 @@
     <link href="https://wa0er.github.io/posts/feb24f25.html"/>
     <id>https://wa0er.github.io/posts/feb24f25.html</id>
     <published>2023-08-28T11:00:00.000Z</published>
-    <updated>2023-08-31T08:07:03.823Z</updated>
+    <updated>2023-11-09T02:34:48.040Z</updated>
     
     
       
@@ -517,8 +601,16 @@
     
     <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
     
+    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
     
-    <category term="HackTheBox" scheme="https://wa0er.github.io/tags/HackTheBox/"/>
+    
+    <category term="API泄露" scheme="https://wa0er.github.io/tags/API%E6%B3%84%E9%9C%B2/"/>
+    
+    <category term="API越权" scheme="https://wa0er.github.io/tags/API%E8%B6%8A%E6%9D%83/"/>
+    
+    <category term="命令执行" scheme="https://wa0er.github.io/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/"/>
+    
+    <category term="CVE-2023-0386（OverlayFS提权）" scheme="https://wa0er.github.io/tags/CVE-2023-0386%EF%BC%88OverlayFS%E6%8F%90%E6%9D%83%EF%BC%89/"/>
     
   </entry>
   

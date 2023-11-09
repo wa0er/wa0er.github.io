@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HackTheBox">
+    <meta name="keywords" content="HackTheBox,Mentor">
     <meta name="description" content="HackTheBox-Mentor">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 6.0.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -430,8 +430,20 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/HackTheBox/">
-                                <span class="chip bg-color">HackTheBox</span>
+                            <a href="/tags/Swagger-UI/">
+                                <span class="chip bg-color">Swagger UI</span>
+                            </a>
+                        
+                            <a href="/tags/SNMP/">
+                                <span class="chip bg-color">SNMP</span>
+                            </a>
+                        
+                            <a href="/tags/JWT%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/">
+                                <span class="chip bg-color">JWT命令执行</span>
+                            </a>
+                        
+                            <a href="/tags/PostgreSQL%E6%95%B0%E6%8D%AE%E5%BA%93/">
+                                <span class="chip bg-color">PostgreSQL数据库</span>
                             </a>
                         
                     </div>
@@ -444,6 +456,10 @@
                         
                             <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
                                 靶机
+                            </a>
+                        
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                HackTheBox
                             </a>
                         
                     </div>
@@ -462,14 +478,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-08-31
+                    2023-11-08
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.9k&nbsp;字
+                    3k&nbsp;字
                 </div>
                 
 
@@ -504,7 +520,23 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="HTB-Mentor"><a href="#HTB-Mentor" class="headerlink" title="HTB-Mentor"></a>HTB-Mentor</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>nmap</p>
+                <h1 id="HTB-Mentor"><a href="#HTB-Mentor" class="headerlink" title="HTB-Mentor"></a>HTB-Mentor</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><ol>
+<li><p>信息收集得到<code>Swagger UI</code>页面、SNMP服务、诸多有效目录；</p>
+</li>
+<li><p>SNMP配置信息泄露管理员james密码；</p>
+</li>
+<li><p>登录james用户获取管理员JWT；</p>
+</li>
+<li><p>利用管理员JWT命令执行获取虚拟root权限；</p>
+</li>
+<li><p>发现PostgreSQL数据库，与之交互获取ssh账户；</p>
+</li>
+<li><p>登录ssh账户运行linpeas，从SNMP配置文件拿到james终端密码；</p>
+</li>
+<li><p>切换james终端用户，提权获取root权限。</p>
+</li>
+</ol>
+<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>nmap</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">┌──(root💀kali)-[~/Desktop]
 └─# nmap -sC -sV -oA nmap/result 10.10.11.193
 Starting Nmap 7.91 ( https://nmap.org ) at 2023-03-05 19:47 EST
@@ -688,7 +720,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1031.83 seconds<span aria-hidden=
 
 Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImphbWVzIiwiZW1haWwiOiJqYW1lc0BtZW50b3JxdW90ZXMuaHRiIn0.peGpmshcF666bimHkYIBKQN7hj5m785uKcjwbD--Na0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h2><p>访问<code>/users/</code>目录，成功拿到用户列表，主要是两个用户：james和service_acc</p>
+<h2 id="三、命令执行"><a href="#三、命令执行" class="headerlink" title="三、命令执行"></a>三、命令执行</h2><p>访问<code>/users/</code>目录，成功拿到用户列表，主要是两个用户：james和service_acc</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230309145453473.png"></p>
 <p>刚才我们爆破出了<code>/admin</code>目录，我们重新用这个JWT访问此目录，发现有两个功能目录</p>
 <pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token property">"admin_funcs"</span><span class="token operator">:</span><span class="token punctuation">{</span>
@@ -883,7 +915,7 @@ uid=1001(svc) gid=1001(svc) groups=1001(svc)
 svc@mentor:~$ pwd
 /home/svc<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="权限提升"><a href="#权限提升" class="headerlink" title="权限提升"></a>权限提升</h2><p>从本地传一个<code>linpeas</code>工具，运行一下，分析可看到有SNMP服务的相关配置文件</p>
+<h2 id="四、权限提升"><a href="#四、权限提升" class="headerlink" title="四、权限提升"></a>四、权限提升</h2><p>从本地传一个<code>linpeas</code>工具，运行一下，分析可看到有SNMP服务的相关配置文件</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230309172001148.png"></p>
 <p>查看<code>/etc/snmp/snmpd.conf</code>，可看到有个密码，站点属主是james，那应该就是james的密码（这个密码跟之前的密码不一样，可能前面的那个只是平台james管理员的密码，这个地方是linux终端james用户的密码）</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">svc@mentor:/tmp$ cat /etc/snmp/snmpd.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -913,22 +945,6 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
 <p>Over！</p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230310104724341.png" style="zoom: 67%;">
 
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
-<li><p>信息收集得到<code>Swagger UI</code>页面、SNMP服务、诸多有效目录；</p>
-</li>
-<li><p>SNMP配置信息泄露管理员james密码；</p>
-</li>
-<li><p>登录james用户获取管理员JWT；</p>
-</li>
-<li><p>利用管理员JWT命令执行获取虚拟root权限；</p>
-</li>
-<li><p>发现PostgreSQL数据库，与之交互获取ssh账户；</p>
-</li>
-<li><p>登录ssh账户运行linpeas，从SNMP配置文件拿到james终端密码；</p>
-</li>
-<li><p>切换james终端用户，提权获取root权限。</p>
-</li>
-</ol>
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>Hackthebox Mentor Writeup：<a target="_blank" rel="noopener" href="https://0xdedinfosec.vercel.app/blog/hackthebox-mentor-writeup">https://0xdedinfosec.vercel.app/blog/hackthebox-mentor-writeup</a></p>
 <p>实战SNMP服务攻击：<a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/network/319234.html">https://www.freebuf.com/articles/network/319234.html</a></p>
 
@@ -995,8 +1011,20 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/HackTheBox/">
-                                    <span class="chip bg-color">HackTheBox</span>
+                                <a href="/tags/Swagger-UI/">
+                                    <span class="chip bg-color">Swagger UI</span>
+                                </a>
+                            
+                                <a href="/tags/SNMP/">
+                                    <span class="chip bg-color">SNMP</span>
+                                </a>
+                            
+                                <a href="/tags/JWT%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/">
+                                    <span class="chip bg-color">JWT命令执行</span>
+                                </a>
+                            
+                                <a href="/tags/PostgreSQL%E6%95%B0%E6%8D%AE%E5%BA%93/">
+                                    <span class="chip bg-color">PostgreSQL数据库</span>
                                 </a>
                             
                         </div>
@@ -1530,6 +1558,10 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1537,8 +1569,12 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/SSRF/">
+                        <span class="chip bg-color">SSRF</span>
+                    </a>
+                    
+                    <a href="/tags/NoSQL%E6%B3%A8%E5%85%A5/">
+                        <span class="chip bg-color">NoSQL注入</span>
                     </a>
                     
                 </div>
@@ -1578,6 +1614,10 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1585,8 +1625,20 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/varnish%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E7%BC%93%E5%AD%98/">
+                        <span class="chip bg-color">varnish反向代理缓存</span>
+                    </a>
+                    
+                    <a href="/tags/%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81%E5%8A%9F%E8%83%BD%E6%8A%95%E6%AF%92/">
+                        <span class="chip bg-color">重置密码功能投毒</span>
+                    </a>
+                    
+                    <a href="/tags/CVE-2022-29216%EF%BC%88%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%EF%BC%89/">
+                        <span class="chip bg-color">CVE-2022-29216（命令执行）</span>
+                    </a>
+                    
+                    <a href="/tags/python%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                        <span class="chip bg-color">python代码审计</span>
                     </a>
                     
                 </div>
@@ -1774,7 +1826,7 @@ uid=0(root) gid=0(root) groups=0(root)<span aria-hidden="true" class="line-numbe
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">62.4k&nbsp;字</span>
+                        class="white-color">61.4k&nbsp;字</span>
             
             
 

