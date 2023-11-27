@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0">
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -474,7 +474,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-11-14
+                    2023-11-27
                 </div>
                 
 
@@ -639,7 +639,8 @@
 <p>此时看LDAP和HTTP服务窗口如下，<code>Exp.class</code>被调用执行</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20230908113454423.png"></p>
 <p>复现成功！</p>
-<h2 id="二、原理分析"><a href="#二、原理分析" class="headerlink" title="二、原理分析"></a>二、原理分析</h2><h3 id="（一）JNDI注入"><a href="#（一）JNDI注入" class="headerlink" title="（一）JNDI注入"></a>（一）JNDI注入</h3><p>参考：<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/12277#toc-2%E3%80%81https://tttang.com/archive/1611/#toc_jndi">https://xz.aliyun.com/t/12277#toc-2、https://tttang.com/archive/1611/#toc_jndi</a></p>
+<h2 id="二、原理分析"><a href="#二、原理分析" class="headerlink" title="二、原理分析"></a>二、原理分析</h2><h3 id="（一）JNDI注入"><a href="#（一）JNDI注入" class="headerlink" title="（一）JNDI注入"></a>（一）JNDI注入</h3><p>参考：<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/12277#toc-2">https://xz.aliyun.com/t/12277#toc-2</a></p>
+<p><a target="_blank" rel="noopener" href="https://tttang.com/archive/1611/#toc_jndi">https://tttang.com/archive/1611/#toc_jndi</a></p>
 <p>JNDI(Java Naming and Directory Interface)是一个应用程序设计的 API，一种标准的 Java 命名系统接口。若程序定义了 JDNI 中的接口 API ，则就可以通过该接口 API 访问系统的 <code>命令服务</code>和<code>目录服务</code>，如下图。JNDI可访问的现有的目录及服务有:<code>JDBC</code>、<code>LDAP</code>、<code>RMI</code>、<code>DNS</code>、<code>NIS</code>、<code>CORBA</code>。</p>
 <img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020153635388.png" style="zoom: 67%;">
 
@@ -689,7 +690,8 @@
 <p><a target="_blank" rel="noopener" href="https://github.com/apache/logging-log4j2/commit/c77b3cb39312b83b053d23a2158b99ac7de44dd3">https://github.com/apache/logging-log4j2/commit/c77b3cb39312b83b053d23a2158b99ac7de44dd3</a></p>
 <p>除去一些测试代码和辅助代码，该commit最主要内容是在 <code>JndiManager.lookup()</code>方法增加了几种限制，分别是<code>allowedHosts</code>、<code>allowedClasses</code>、<code>allowedProtocols</code>。</p>
 <p>由于rc1未在maven中央仓库上，因此需要自行下载代码并构建：</p>
-<p>到Log4j2的GitHub官方仓库下载rc1：<a target="_blank" rel="noopener" href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc1%E3%80%82%E5%88%86%E5%88%AB%E8%BF%9B%E5%85%A5log4j-api%E5%92%8Clog4j-core%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%89%A7%E8%A1%8C%60mvn">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc1。分别进入log4j-api和log4j-core目录，执行`mvn</a> clean install -DskipTests`。最终会在本地maven仓库上生成rc1的jar包，版本为2.15.0，后续测试使用该jar包。</p>
+<p>到Log4j2的GitHub官方仓库下载rc1：<a target="_blank" rel="noopener" href="https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc1%E3%80%82">https://github.com/apache/logging-log4j2/releases/tag/log4j-2.15.0-rc1。</a></p>
+<p>分别进入log4j-api和log4j-core目录，执行<code>mvn clean install -DskipTests</code>。最终会在本地maven仓库上生成rc1的jar包，版本为2.15.0，后续测试使用该jar包。</p>
 <p><strong>说明：</strong>此处笔者尝试构建时，maven的国内镜像（阿里云、腾讯云、华为云、网易云）均无法解析2.15.0的jar包</p>
 <p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231020174739501.png"></p>
 <p>以下图片参考：<a target="_blank" rel="noopener" href="https://www.freebuf.com/vuls/316143.html">https://www.freebuf.com/vuls/316143.html</a></p>
