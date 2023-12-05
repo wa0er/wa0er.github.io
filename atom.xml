@@ -6,7 +6,7 @@
   <link href="https://wa0er.github.io/atom.xml" rel="self"/>
   
   <link href="https://wa0er.github.io/"/>
-  <updated>2023-11-08T07:26:41.108Z</updated>
+  <updated>2023-12-05T06:12:18.885Z</updated>
   <id>https://wa0er.github.io/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Fastjson系列漏洞复现及原理调试分析</title>
+    <link href="https://wa0er.github.io/posts/d5d1bb40.html"/>
+    <id>https://wa0er.github.io/posts/d5d1bb40.html</id>
+    <published>2023-12-05T04:00:00.000Z</published>
+    <updated>2023-12-05T06:12:18.885Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;Fastjson系列漏洞复现及原理调试分析&quot;&gt;&lt;a href=&quot;#Fastjson系列漏洞复现及原理调试分析&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="漏洞复现" scheme="https://wa0er.github.io/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/"/>
+    
+    <category term="细读经典" scheme="https://wa0er.github.io/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/%E7%BB%86%E8%AF%BB%E7%BB%8F%E5%85%B8/"/>
+    
+    
+    <category term="JNDI注入" scheme="https://wa0er.github.io/tags/JNDI%E6%B3%A8%E5%85%A5/"/>
+    
+    <category term="Fastjson" scheme="https://wa0er.github.io/tags/Fastjson/"/>
+    
+  </entry>
   
   <entry>
     <title>HTB-Sandworm</title>
@@ -578,39 +607,6 @@
     <category term="TypeScript代码审计" scheme="https://wa0er.github.io/tags/TypeScript%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
     <category term="MongoDB盲注" scheme="https://wa0er.github.io/tags/MongoDB%E7%9B%B2%E6%B3%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HTB-TwoMillion</title>
-    <link href="https://wa0er.github.io/posts/feb24f25.html"/>
-    <id>https://wa0er.github.io/posts/feb24f25.html</id>
-    <published>2023-08-28T11:00:00.000Z</published>
-    <updated>2023-11-09T02:34:48.040Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;HTB-TwoMillion&quot;&gt;&lt;a href=&quot;#HTB-TwoMillion&quot; class=&quot;headerlink&quot; title=&quot;HTB-TwoMillion&quot;&gt;&lt;/a&gt;HTB-TwoMillion&lt;/h1&gt;&lt;h2 id=&quot;一、思路概要&quot;&gt;&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="靶机" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/"/>
-    
-    <category term="HackTheBox" scheme="https://wa0er.github.io/categories/%E9%9D%B6%E6%9C%BA/HackTheBox/"/>
-    
-    
-    <category term="API泄露" scheme="https://wa0er.github.io/tags/API%E6%B3%84%E9%9C%B2/"/>
-    
-    <category term="API越权" scheme="https://wa0er.github.io/tags/API%E8%B6%8A%E6%9D%83/"/>
-    
-    <category term="命令执行" scheme="https://wa0er.github.io/tags/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/"/>
-    
-    <category term="CVE-2023-0386（OverlayFS提权）" scheme="https://wa0er.github.io/tags/CVE-2023-0386%EF%BC%88OverlayFS%E6%8F%90%E6%9D%83%EF%BC%89/"/>
     
   </entry>
   

