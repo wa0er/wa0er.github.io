@@ -30,9 +30,9 @@
 
     <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
 
-<meta name="generator" content="Hexo 6.0.0">
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
+
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="wa0er" type="application/atom+xml">
 </head>
 
 
@@ -470,14 +470,14 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2023-12-05
+                    2023-12-11
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    7.2k&nbsp;字
+                    7.3k&nbsp;字
                 </div>
                 
 
@@ -1141,6 +1141,10 @@ com.sun.rowset.JdbcRowSetImpl#setAutoCommit<span aria-hidden="true" class="line-
 <p><strong>为什么1.2.25-1.2.32版本开启AutoTypeSupport反而不能成功触发？</strong></p>
 <p>对比发现正是因为这个判断位置不一样，少了个判断条件，即<code>TypeUtils.getClassFromMapping(typeName) == null</code></p>
 <h3 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h3><p>针对上述问题，<code>1.2.48</code>中的修复措施是，在loadClass()时，将缓存开关默认置为False，所以默认是不能通过Class加载进缓存了。同时将Class类加入到了黑名单中。</p>
+<h4 id="safeMode加固"><a href="#safeMode加固" class="headerlink" title="safeMode加固"></a>safeMode加固</h4><p>Fastjson在1.2.68及之后的版本中引入了safeMode，配置safeMode后，无论白名单和黑名单，都不支持autoType，可杜绝反序列化Gadgets类变种攻击。开启safeMode是完全关闭autoType功能，可能会有兼容问题。</p>
+<p>具体参考：<a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/wiki/security_update_20220523">https://github.com/alibaba/fastjson/wiki/security_update_20220523</a></p>
+<p>目前2022年5月23日发布的Fastjson 1.2.83是1.x系列的最后一个版本</p>
+<p>从2022年4月17日开始，Fastjson也进入了2.0时代。</p>
 <h2 id="高版本JDK绕过思路"><a href="#高版本JDK绕过思路" class="headerlink" title="高版本JDK绕过思路"></a>高版本JDK绕过思路</h2><p>由之前利用的PoC知道，利用范围最广的PoC是基于<code>com.sun.rowset.JdbcRowSetImpl</code>的利用链的，而这种利用方式是基于JNDI注入漏洞的，是需要我们有RMI服务或LDAP服务。</p>
 <p>这样就会导致一个限制的问题，即JNDI注入漏洞利用的限制问题——JDK版本。</p>
 <p>由之前的分析知道，JDK对于JNDI注入漏洞在不同版本有着不同的防御措施：</p>
@@ -1180,6 +1184,7 @@ JSON<span class="token punctuation">.</span><span class="token function">parseOb
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>Fastjson系列：<a target="_blank" rel="noopener" href="http://www.mi1k7ea.com/archives/2019/">http://www.mi1k7ea.com/archives/2019/</a></p>
 <p>Fastjson反序列化漏洞的调试与分析：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_34101364/article/details/111706189">https://blog.csdn.net/qq_34101364/article/details/111706189</a></p>
 <p>Fastjson系列-漏洞复现：<a target="_blank" rel="noopener" href="https://www.freebuf.com/vuls/358459.html">https://www.freebuf.com/vuls/358459.html</a></p>
+<p>Fastjson不出网利用总结：<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/12492">https://xz.aliyun.com/t/12492</a></p>
 
                 
             </div>
@@ -2049,7 +2054,7 @@ JSON<span class="token punctuation">.</span><span class="token function">parseOb
             
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点文章总字数:&nbsp;<span
-                        class="white-color">68.7k&nbsp;字</span>
+                        class="white-color">68.8k&nbsp;字</span>
             
             
 

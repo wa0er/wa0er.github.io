@@ -9427,6 +9427,10 @@ com.sun.rowset.JdbcRowSetImpl#setAutoCommit<span aria-hidden="true" class="line-
 <p><strong>为什么1.2.25-1.2.32版本开启AutoTypeSupport反而不能成功触发？</strong></p>
 <p>对比发现正是因为这个判断位置不一样，少了个判断条件，即<code>TypeUtils.getClassFromMapping(typeName) == null</code></p>
 <h3 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h3><p>针对上述问题，<code>1.2.48</code>中的修复措施是，在loadClass()时，将缓存开关默认置为False，所以默认是不能通过Class加载进缓存了。同时将Class类加入到了黑名单中。</p>
+<h4 id="safeMode加固"><a href="#safeMode加固" class="headerlink" title="safeMode加固"></a>safeMode加固</h4><p>Fastjson在1.2.68及之后的版本中引入了safeMode，配置safeMode后，无论白名单和黑名单，都不支持autoType，可杜绝反序列化Gadgets类变种攻击。开启safeMode是完全关闭autoType功能，可能会有兼容问题。</p>
+<p>具体参考：<a href="https://github.com/alibaba/fastjson/wiki/security_update_20220523">https://github.com/alibaba/fastjson/wiki/security_update_20220523</a></p>
+<p>目前2022年5月23日发布的Fastjson 1.2.83是1.x系列的最后一个版本</p>
+<p>从2022年4月17日开始，Fastjson也进入了2.0时代。</p>
 <h2 id="高版本JDK绕过思路"><a href="#高版本JDK绕过思路" class="headerlink" title="高版本JDK绕过思路"></a>高版本JDK绕过思路</h2><p>由之前利用的PoC知道，利用范围最广的PoC是基于<code>com.sun.rowset.JdbcRowSetImpl</code>的利用链的，而这种利用方式是基于JNDI注入漏洞的，是需要我们有RMI服务或LDAP服务。</p>
 <p>这样就会导致一个限制的问题，即JNDI注入漏洞利用的限制问题——JDK版本。</p>
 <p>由之前的分析知道，JDK对于JNDI注入漏洞在不同版本有着不同的防御措施：</p>
@@ -9466,6 +9470,7 @@ JSON<span class="token punctuation">.</span><span class="token function">parseOb
 <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>Fastjson系列：<a href="http://www.mi1k7ea.com/archives/2019/">http://www.mi1k7ea.com/archives/2019/</a></p>
 <p>Fastjson反序列化漏洞的调试与分析：<a href="https://blog.csdn.net/qq_34101364/article/details/111706189">https://blog.csdn.net/qq_34101364/article/details/111706189</a></p>
 <p>Fastjson系列-漏洞复现：<a href="https://www.freebuf.com/vuls/358459.html">https://www.freebuf.com/vuls/358459.html</a></p>
+<p>Fastjson不出网利用总结：<a href="https://xz.aliyun.com/t/12492">https://xz.aliyun.com/t/12492</a></p>
 ]]></content>
       <categories>
         <category>漏洞复现</category>
